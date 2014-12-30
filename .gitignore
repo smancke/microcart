@@ -1,0 +1,11 @@
+.checkstyle
+.pmd
+.classpath
+.project
+.settings
+target
+node_modules
+./front-service/.settings
+./front-service/target
+model/.settings
+model/.target

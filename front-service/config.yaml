@@ -1,0 +1,22 @@
+message: Hallo Dropwizard
+backendURL: http://172.17.42.1:5001
+
+server:
+  applicationConnectors:
+    - type: http
+      port: 5003
+  adminConnectors:
+    - type: http
+      port: 5004
+
+logging:
+
+  # The default level of all loggers. Can be OFF, ERROR, WARN, INFO,
+  # DEBUG, TRACE, or ALL.
+  level: INFO
+
+  # Logger-specific levels.
+  loggers:
+
+    # Sets the level for 'com.example.app' to DEBUG.
+    org.deutschepost: TRACE
