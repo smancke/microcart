@@ -7,7 +7,6 @@ public class Position {
 	String imageUrl;
 	float quantity;
 	float pricePerUnit;
-	float positionPrice;
 	
 	public String getArticleId() {
 		return articleId;
@@ -40,9 +39,6 @@ public class Position {
 		this.pricePerUnit = pricePerUnit;
 	}
 	public float getPositionPrice() {
-		return positionPrice;
-	}
-	public void setPositionPrice(float positionPrice) {
-		this.positionPrice = positionPrice;
+		return pricePerUnit * quantity;
 	}
 }

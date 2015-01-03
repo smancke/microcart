@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.FormParam;
@@ -31,36 +32,21 @@ import com.codahale.metrics.annotation.Timed;
  */
 @Path("/shop")
 public class CartResource {
-
-    private static final String CART_RESOURCE = "/shop/cart";
     
 	/**
      * The global configuration.
      */
     private FrontConfiguration configuration;
 
+	private CartService cartService;
+
     /**
      */
     @Inject
-    public CartResource(final FrontConfiguration cfg) {
+    public CartResource(final FrontConfiguration cfg, CartService cartService) {
         this.configuration = cfg;
+        this.cartService = cartService;
     }
-
-//    /**
-//     * returns the cart of the current user or session.
-//     * @return
-//     * @throws URISyntaxException
-//     */
-//    @Timed
-//    @GET
-//    @Path("/my-cart")
-//    @Produces(MediaType.APPLICATION_JSON)
-//    public Cart getMyCart(@CookieParam(TrackingIdFilter.TRACKING_COOKIE_KEY) String trackingId) 
-//    		throws URISyntaxException {
-//    	
-//    	return getOrCreateCartByTrackingId(trackingId);
-//    }
-
 
     /**
      * returns the cart of the current user or session.
@@ -70,11 +56,11 @@ public class CartResource {
     @Timed
     @GET
     @Path("/my-cart")
-    @Produces({MediaType.TEXT_HTML, MediaType.APPLICATION_JSON})
+    @Produces({"text/html; charset=utf-8", MediaType.APPLICATION_JSON})
     public CartView getMyCartHtml(@CookieParam(TrackingIdFilter.TRACKING_COOKIE_KEY) String trackingId) 
     		throws URISyntaxException {
     	
-    	return new CartView(getOrCreateCartByTrackingId(trackingId));
+    	return new CartView(cartService.getOrCreateCartByTrackingId(trackingId));
     }
 
     /**
@@ -87,7 +73,7 @@ public class CartResource {
     public String getMyCartItemCount(@CookieParam(TrackingIdFilter.TRACKING_COOKIE_KEY) String trackingId) 
     		throws URISyntaxException {
     	
-    	return ""+ getOrCreateCartByTrackingId(trackingId).getPositions().size();
+    	return ""+ cartService.getOrCreateCartByTrackingId(trackingId).getPositions().size();
     }
 
     /**
@@ -100,53 +86,39 @@ public class CartResource {
     @Path("/my-cart/article")
     public Response updateCartItem(@CookieParam(TrackingIdFilter.TRACKING_COOKIE_KEY) String trackingId, 
     		@FormParam("articleId") String articleId, 
-    		@FormParam("quantity") float quantity,
+    		@FormParam("quantity") String quantityInput,
+    		@FormParam("action") String action,
     		@Context HttpServletRequest req) 
     		throws URISyntaxException {
     	
-    	Cart cart = getOrCreateCartByTrackingId(trackingId);
-    	Position position = new Position();
-    	position.setArticleId(articleId);
-    	position.setQuantity(quantity);
+    	Cart cart = cartService.getOrCreateCartByTrackingId(trackingId);
+    	
+    	if ("removeArticle".equals(action)) {
+    		quantityInput = "0";
+    	}
+    	quantityInput = quantityInput.replace(",", ".");
+    	quantityInput = quantityInput.replaceAll("[^0-9\\.]", "");
+    	Position position = getNewPosition(articleId, Float.parseFloat(quantityInput));
     	
     	cart.addDeleteOrUpdatePosition(position);
-    	saveCartToBackend(cart);
+    	cartService.saveCartToBackend(cart);
     	if (req.getHeader("Referer") != null) {
     		return Response.seeOther(new URI(req.getHeader("Referer"))).build();
     	}
     	return Response.seeOther(new URI("/shop/my-cart")).build();
     }
-    
-    private Cart getOrCreateCartByTrackingId(String trackingId) {
-		if (trackingId != null && ! trackingId.isEmpty()) {
-    		Cart cart = loadCartFromBackend(trackingId);
-    		if (cart != null) {
-    			return cart;
-    		}
-    	}	
-    	return newEmptyCart(trackingId);
-	}
 
-	private Cart loadCartFromBackend(String trackingId) {
-		RestTemplate restTemplate = new RestTemplate();
-		try {
-			return restTemplate.getForObject(configuration.getBackendURL() + CART_RESOURCE + "/"+ trackingId, Cart.class);
-		} catch (HttpClientErrorException ex)   {
-		    if (ex.getStatusCode().value() == 404) {
-		        return null;
-		    }
-		    throw ex;
-		}
-	}
-
-	private void saveCartToBackend(Cart cart) {
-		RestTemplate restTemplate = new RestTemplate();
-		restTemplate.postForLocation(configuration.getBackendURL() + CART_RESOURCE, cart);
-	}
-
-	private Cart newEmptyCart(String trackingId) {
-		Cart cart = new Cart();
-		cart.setId(trackingId);
-		return cart;
+	private Position getNewPosition(String articleId, float quantity) {
+		Position position = new Position();
+    	position.setArticleId(articleId);
+    	position.setQuantity(quantity);
+    	
+    	ArticleService articleService = new ArticleService(configuration);
+    	ArticleService.Article article = articleService.getArticle(articleId);
+    	position.setPricePerUnit(article.getPrice());
+    	position.setImageUrl(article.getImg_thumb());
+    	position.setTitle(article.getTitle());
+    	
+		return position;
 	}
 }

@@ -1,8 +1,7 @@
 package net.mancke.microcart;
 
 import io.dropwizard.Configuration;
-
-import org.hibernate.validator.constraints.NotEmpty;
+import net.mancke.microcart.osiam.OsiamLoginConfiguration;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -11,12 +10,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FrontConfiguration extends Configuration {
 
-    @NotEmpty
-    @JsonProperty
-    private String message;
-
-    @JsonProperty
+	@JsonProperty
     private String backendURL = "http://127.0.0.1:5001";
+    
+    @JsonProperty
+    private OsiamLoginConfiguration osiamLogin;
     
 	public String getBackendURL() {
 		return backendURL;
@@ -26,11 +24,12 @@ public class FrontConfiguration extends Configuration {
 		this.backendURL = backendURL;
 	}
 
-	public String getMessage() {
-		return message;
+	public OsiamLoginConfiguration getOsiamLogin() {
+		return osiamLogin;
 	}
 
-	public void setMessage(String message) {
-		this.message = message;
+	public void setOsiamLogin(OsiamLoginConfiguration osiamLogin) {
+		this.osiamLogin = osiamLogin;
 	}
+
 }

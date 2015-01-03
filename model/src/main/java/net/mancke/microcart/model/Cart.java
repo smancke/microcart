@@ -9,6 +9,7 @@ public class Cart {
 	
 	String id;
 	List<Position> positions = Collections.EMPTY_LIST;
+	OrderData orderData = new OrderData();
 	
 	public String getId() {
 		return id;
@@ -21,6 +22,14 @@ public class Cart {
 	}
 	public void setPositions(List<Position> position) {
 		this.positions = position;
+	}
+	
+	public float getTotalPrice() {
+		float sum = 0;
+		for (Position position : positions) {
+			sum += position.getPositionPrice();
+		}
+		return sum;
 	}
 
 	public String toString() {
@@ -44,5 +53,11 @@ public class Cart {
 		if (position.getQuantity() > 0) {
 			positions.add(position);
 		}
+	}
+	public OrderData getOrderData() {
+		return orderData;
+	}
+	public void setOrderData(OrderData orderData) {
+		this.orderData = orderData;
 	}
 }

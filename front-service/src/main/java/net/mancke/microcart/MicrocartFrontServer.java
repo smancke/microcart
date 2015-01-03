@@ -4,6 +4,7 @@ import java.util.EnumSet;
 
 import javax.servlet.DispatcherType;
 
+import de.thomaskrille.dropwizard.environment_configuration.EnvironmentConfigurationFactoryFactory;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.setup.Bootstrap;
@@ -13,11 +14,11 @@ import io.dropwizard.views.ViewBundle;
 /**
  * @author smancke
  */
-public class MicrocartFrontService extends Application<FrontConfiguration> {
+public class MicrocartFrontServer extends Application<FrontConfiguration> {
 
 	@Override
 	public String getName() {
-	      return "Microcart Front Service";
+	      return "Microcart Front Server";
 	}
 	
     /**
@@ -27,7 +28,7 @@ public class MicrocartFrontService extends Application<FrontConfiguration> {
      */
     public static void main(final String[] args) {
         try {
-            new MicrocartFrontService().run(args);
+            new MicrocartFrontServer().run(args);
         } catch (Exception e) {
             System.out.println("Error while startup"); // NOSONAR
             e.printStackTrace(); // NOSONAR
@@ -43,6 +44,7 @@ public class MicrocartFrontService extends Application<FrontConfiguration> {
     @Override
     public void initialize(final Bootstrap<FrontConfiguration> bootstrap) {
     	 bootstrap.addBundle(new ViewBundle());
+    	 bootstrap.setConfigurationFactoryFactory(new EnvironmentConfigurationFactoryFactory<FrontConfiguration>());
     }
 
     /**
@@ -59,8 +61,11 @@ public class MicrocartFrontService extends Application<FrontConfiguration> {
     	environment.servlets()
     		.addFilter("trackingIdFilter", new TrackingIdFilter())
     		.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
+    	
         // Our Resources
-    	environment.jersey().register(new CartResource(configuration));
+    	CartService cartService = new CartService(configuration);
+    	environment.jersey().register(new CartResource(configuration, cartService));
+    	environment.jersey().register(new OrderResource(configuration, cartService));
     	
         // An example HealthCheck
         environment.healthChecks().register("demo health", new Health());       
