@@ -75,6 +75,6 @@ public class OsiamLoginConfiguration {
 	}
 
 	public void setSessionLifetimeMinutes(int sessionLifetimeMinutes) {
-		sessionLifetimeMinutes = sessionLifetimeMinutes;
+		this.sessionLifetimeMinutes = sessionLifetimeMinutes;
 	}	
 }

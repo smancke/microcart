@@ -3,9 +3,19 @@
 <#setting locale="de_DE">
 <#assign d=cart.orderData>
 
+<#escape x as x?html>
     <div class="form-container container">
         <h1>Bestellung</h1>
         
+    <#if validationErrors?? && validationErrors?size != 0>
+      <div class="alert alert-danger" >
+        <ul>
+	    <#list validationErrors as error>
+	    	<li>${error.message}</li>
+	    </#list>
+	    </ul>
+	  </div>
+	</#if>    
   	<form autocomplete="on" method="POST" name="/shop/orderData">
       <section class="form-part">
         <h3>Persönliche Daten</h3>
@@ -26,8 +36,8 @@
 	          <input type="text" class="form-control" id="givenName" name="givenName" value="${d.givenName!}"/>
 			 </div>
              <div class="form-field">	
-	          <label for="lastName" class="required">Nachname</label>
-	          <input type="text" class="form-control" id="lastName" name="lastName" value="${d.lastName!}"/>           
+	          <label for="familyName" class="required">Nachname</label>
+	          <input type="text" class="form-control" id="familyName" name="familyName" value="${d.familyName!}"/>           
 			 </div>
           </li>
           <li class="form-field-group">
@@ -47,22 +57,18 @@
         <ul class="form-fields">
           <li class="form-field-group">
              <div class="form-field">	
-	          <label for="streetAddress" class="required">Straße</label>
-	          <input type="text" class="form-control" id="streetAddress" name="address.streetAddress" value="${d.streetAddress!}"/>
-			 </div>
-             <div class="form-field">		
-	          <label for="hnr" class="required">Hausnummer</label>
-	          <input type="text" class="form-control" id="hnr" name="address.hnr" value="${d.hnr!}"/>           
+	          <label for="streetAddress" class="required">Straße, Hausnr.</label>
+	          <input type="text" class="form-control" id="streetAddress" name="streetAddress" value="${d.streetAddress!}"/>
 			 </div>
           </li>
           <li class="form-field-group">
              <div class="form-field">	
 	          <label for="postalCode" class="required">Postleitzahl</label>
-	          <input type="text" class="form-control" id="postalCode" name="address.postalCode" value="${d.postalCode!}"/>
+	          <input type="text" class="form-control" id="postalCode" name="postalCode" value="${d.postalCode!}"/>
 			 </div>
              <div class="form-field">		
 	          <label for="locality" class="required">Ort</label>
-	          <input type="text" class="form-control" id="locality" name="address.locality" value="${d.locality!}"/>           
+	          <input type="text" class="form-control" id="locality" name="locality" value="${d.locality!}"/>           
 			 </div>
           </li>
         </ul>
@@ -110,11 +116,12 @@
       </section>
 
       <section class="call-to-action">
-        <input type="submit" value="Weiter &gt;&gt;" class="btn btn-lg  btn-primary"/>
-        <input type="submit" name="goBack" value="&lt;&lt; Zurück" class="btn btn-lg  btn-default"/>
+        <input type="submit" value="Jetzt kaufen &gt;&gt;" class="btn btn-lg  btn-primary"/>
+        <input type="submit" name="goBack" value="&lt;&lt; Warenkorb" class="btn btn-lg  btn-default"/>
       </section>
     </form>
         
     </div> 
     
+</#escape>
 <!--# include virtual="/_footer" -->

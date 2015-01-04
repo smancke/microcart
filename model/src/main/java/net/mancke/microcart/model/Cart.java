@@ -5,12 +5,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.joda.time.DateTime;
+
 public class Cart {
 	
-	String id;
-	List<Position> positions = Collections.EMPTY_LIST;
-	OrderData orderData = new OrderData();
-	
+	private String id;
+	private String userId;
+	private List<Position> positions = Collections.EMPTY_LIST;
+	private OrderData orderData = new OrderData();
+    private DateTime timestamp = new DateTime();
+    private DateTime timestampLastUpdated = new DateTime();
+    
 	public String getId() {
 		return id;
 	}
@@ -59,5 +64,23 @@ public class Cart {
 	}
 	public void setOrderData(OrderData orderData) {
 		this.orderData = orderData;
+	}
+	public String getUserId() {
+		return userId;
+	}
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+	public DateTime getTimestamp() {
+		return timestamp;
+	}
+	public void setTimestamp(DateTime timestamp) {
+		this.timestamp = timestamp;
+	}
+	public DateTime getTimestampLastUpdated() {
+		return timestampLastUpdated;
+	}
+	public void setTimestampLastUpdated(DateTime timestampLastUpdated) {
+		this.timestampLastUpdated = timestampLastUpdated;
 	}
 }

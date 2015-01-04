@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.FormParam;
@@ -19,11 +20,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
+import org.osiam.resources.scim.User;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import net.mancke.microcart.model.Cart;
 import net.mancke.microcart.model.Position;
+import net.mancke.microcart.osiam.LoginHandler;
 
 import com.codahale.metrics.annotation.Timed;
 
@@ -88,25 +91,45 @@ public class CartResource {
     		@FormParam("articleId") String articleId, 
     		@FormParam("quantity") String quantityInput,
     		@FormParam("action") String action,
-    		@Context HttpServletRequest req) 
+    		@Context HttpServletRequest req,
+    		@BeanParam LoginHandler loginHandler) 
     		throws URISyntaxException {
     	
     	Cart cart = cartService.getOrCreateCartByTrackingId(trackingId);
     	
-    	if ("removeArticle".equals(action)) {
-    		quantityInput = "0";
-    	}
-    	quantityInput = quantityInput.replace(",", ".");
-    	quantityInput = quantityInput.replaceAll("[^0-9\\.]", "");
-    	Position position = getNewPosition(articleId, Float.parseFloat(quantityInput));
+    	Float quantity = verifyQuantity(action, quantityInput);
+    	Position position = getNewPosition(articleId, quantity);
     	
     	cart.addDeleteOrUpdatePosition(position);
+    	
+    	setUserIdToCart(loginHandler, cart);
+    	
     	cartService.saveCartToBackend(cart);
+    	
     	if (req.getHeader("Referer") != null) {
     		return Response.seeOther(new URI(req.getHeader("Referer"))).build();
     	}
     	return Response.seeOther(new URI("/shop/my-cart")).build();
     }
+
+	private float verifyQuantity(String action, String quantityInput) {
+		if ("removeArticle".equals(action)) {
+    		quantityInput = "0";
+    	}
+    	quantityInput = quantityInput.replace(",", ".");
+    	quantityInput = quantityInput.replaceAll("[^0-9\\.]", "");
+    	try {
+    		return Float.parseFloat(quantityInput);
+    	} catch (NumberFormatException nfe) {
+    		return 1f;
+    	}
+	}
+
+	private void setUserIdToCart(LoginHandler loginHandler, Cart cart) {
+		if (loginHandler.verifyLogin()) {
+			cart.setUserId( loginHandler.getAuthCookie().getUserId() );
+    	}
+	}
 
 	private Position getNewPosition(String articleId, float quantity) {
 		Position position = new Position();

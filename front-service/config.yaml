@@ -5,7 +5,7 @@ osiamLogin:
   authServerEndpoint: $env:OSIAM_AUTH_SERVER_HOME:http://127.0.0.1:5101/osiam-auth-server/
   resourceServerEndpoint: $env:OSIAM_RESOURCE_SERVER_HOME:http://127.0.0.1:5102/osiam-resource-server/
   clientId: $env:OSIAM_CLIENT_ID:bsweb
-  clientSecret: $env:OSIAM_CLIENT_SECRET:super-secret
+  clientSecret: $env:OSIAM_CLIENT_SECRET:ksdlcmsdlcmsldk
   sessionCookieSecret: $env:SESSION_SECRET:e2l21$%678bdwkml
   sessionLifetimeMinutes: $env:SESSION_LIFETIME:180
 

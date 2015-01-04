@@ -5,9 +5,11 @@ import java.util.List;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
+import javax.management.RuntimeErrorException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Context;
 
 import org.osiam.client.OsiamConnector;
 import org.osiam.client.exception.ConnectionInitializationException;
@@ -21,6 +23,13 @@ import org.springframework.util.Base64Utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * The LoginHandler is able to login with osiam an manage a crypted cookie for 
+ * authentication of the web session. It can be used directly of injected as JAX-RS BeanProperty.
+ * 
+ * @author smancke
+ *
+ */
 public class LoginHandler {
 
     private final Logger logger = LoggerFactory.getLogger(LoginHandler.class);
@@ -28,23 +37,30 @@ public class LoginHandler {
     private static final String COOKIE_NAME = "okmsdc";
 
     private static final String ALGO = "AES";
+    
     private OsiamLoginConfiguration config;
 
+    @Context 
     private HttpServletRequest req;
 
+    @Context
     private HttpServletResponse res;
 
     private AuthCookie authCookie;
 
+    public LoginHandler() {    	
+    }
+    
     public LoginHandler(OsiamLoginConfiguration config, HttpServletRequest req, HttpServletResponse res) {
         this.req = req;
         this.res = res;
         this.config = config;
-        this.authCookie = readAuthCookie();
     }
 
     public boolean verifyLogin() {
-
+    	if (authCookie == null) {
+    		authCookie = readAuthCookie();
+    	}
         if (authCookie != null
                 && authCookie.getAgeMinutes() < config.getSessionLifetimeMinutes()) {
 
@@ -57,18 +73,28 @@ public class LoginHandler {
         }
         return false;
     }
+    
+    /**
+     * Returs the osiam user object to the current session.
+     * @return null, if no valid session is available.
+     */
+	public User getUser() {
+		if (getAuthCookie() == null)
+			return null;
+		OsiamConnector osiam = osiam();
+		AccessToken accessToken = osiam.retrieveAccessToken(Scope.GET);
+		return osiam.getUser(getAuthCookie().getUserId(), accessToken);
+	}
 
     public AuthCookie getAuthCookie() {
+    	if (authCookie == null) {
+    		authCookie = readAuthCookie();
+    	}
         return authCookie;
     }
 
     public boolean doLogin() {
-        OsiamConnector osiam = new OsiamConnector.Builder()
-                .setAuthServerEndpoint(config.getAuthServerEndpoint())
-                .setResourceServerEndpoint(config.getResourceServerEndpoint())
-                .setClientId(config.getClientId())
-                .setClientSecret(config.getClientSecret())
-                .build();
+        OsiamConnector osiam = osiam();
 
         try {
             AccessToken accessToken = osiam
@@ -85,6 +111,16 @@ public class LoginHandler {
         }
         return true;
     }
+
+	private OsiamConnector osiam() {
+		OsiamConnector osiam = new OsiamConnector.Builder()
+                .setAuthServerEndpoint(config.getAuthServerEndpoint())
+                .setResourceServerEndpoint(config.getResourceServerEndpoint())
+                .setClientId(config.getClientId())
+                .setClientSecret(config.getClientSecret())
+                .build();
+		return osiam;
+	}
 
     public void doLogout() {
         clearCookie();
@@ -106,6 +142,9 @@ public class LoginHandler {
     }
 
     private SecretKeySpec key() {
+    	if (config.getSessionCookieSecret() == null || config.getSessionCookieSecret().isEmpty())
+    		throw new RuntimeException("no session cookie secret is configured");
+    	
         return new SecretKeySpec(config.getSessionCookieSecret().getBytes(), ALGO);
     }
 
@@ -173,8 +212,32 @@ public class LoginHandler {
         }
         Cookie cookie = new Cookie(COOKIE_NAME, cookieBytes);
         cookie.setPath("/");
-        cookie.setMaxAge(60 * 60 * 24 * 365);
+        cookie.setMaxAge(60 * config.getSessionLifetimeMinutes());
         cookie.setHttpOnly(true);
         res.addCookie(cookie);
     }
+
+	public OsiamLoginConfiguration getConfig() {
+		return config;
+	}
+
+	public void setConfig(OsiamLoginConfiguration config) {
+		this.config = config;
+	}
+
+	public HttpServletRequest getReq() {
+		return req;
+	}
+
+	public void setReq(HttpServletRequest req) {
+		this.req = req;
+	}
+
+	public HttpServletResponse getRes() {
+		return res;
+	}
+
+	public void setRes(HttpServletResponse res) {
+		this.res = res;
+	}
 }

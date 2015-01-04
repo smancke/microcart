@@ -37,8 +37,10 @@
 		             <form class="" action="/shop/my-cart/article" method="POST">
 		                <input type="hidden" name="articleId" value="${position.articleId}">
                         <div class="form-group">
-			                <div class="input-group" style="width: 170px">
-			                  <input type="quantity" value="${position.quantity}" class="form-control" name="quantity" placeholder="m">
+			                <div class="input-group">
+			                  <#setting locale="us_US">
+			                  <input type="number" step="0.1" min="0.5" max="500" value="${position.quantity}" class="form-control" name="quantity" placeholder="m">
+			                  <#setting locale="de_DE">
 			                  <div class="input-group-addon">m</div>
 			                  <div class="input-group-btn">
 				                <button type="submit" class="btn btn-default">

@@ -7,7 +7,7 @@ import javax.ws.rs.FormParam;
  * filled for an order.
  */
 public class OrderData {
-
+	
 	@FormParam("familyName")
 	private String familyName;
 	
@@ -25,9 +25,6 @@ public class OrderData {
 	
 	@FormParam("streetAddress")
     private String streetAddress;
-
-	@FormParam("houseNumber")
-	private String houseNumber;
 
 	@FormParam("locality")
     private String locality;
@@ -79,12 +76,6 @@ public class OrderData {
 	}
 	public void setStreetAddress(String streetAddress) {
 		this.streetAddress = streetAddress;
-	}
-	public String getHouseNumber() {
-		return houseNumber;
-	}
-	public void setHouseNumber(String houseNumber) {
-		this.houseNumber = houseNumber;
 	}
 	public String getLocality() {
 		return locality;

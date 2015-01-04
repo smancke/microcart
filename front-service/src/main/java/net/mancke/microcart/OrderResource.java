@@ -4,6 +4,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -15,9 +17,15 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
+import org.osiam.resources.scim.Address;
+import org.osiam.resources.scim.Email;
+import org.osiam.resources.scim.MultiValuedAttribute;
+import org.osiam.resources.scim.PhoneNumber;
+import org.osiam.resources.scim.User;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
@@ -35,6 +43,10 @@ import com.codahale.metrics.annotation.Timed;
 public class OrderResource {
 
     private static final String ORDER_RESOURCE = "/shop/order";
+
+	private static final Object PAYPAL = "paypal";
+
+	private static final Object PRECASH = "preCash";
     
 	/**
      * The global configuration.
@@ -62,11 +74,10 @@ public class OrderResource {
     @Produces({"text/html; charset=utf-8"})
     public Response getOrderRegisterForm(
     		@CookieParam(TrackingIdFilter.TRACKING_COOKIE_KEY) String trackingId,
-    		@Context HttpServletRequest req,
-    		@Context HttpServletResponse res) 
+    		@BeanParam LoginHandler loginHandler) 
     		throws URISyntaxException {
     	
-    	LoginHandler loginHandler = new LoginHandler(configuration.getOsiamLogin(), req, res);
+    	loginHandler.setConfig(configuration.getOsiamLogin());
     	if (loginHandler.verifyLogin()) {
     		return Response.seeOther(new URI("/shop/orderData")).build();
     	}
@@ -84,13 +95,17 @@ public class OrderResource {
     @GET
     @Path("/orderData")
     @Produces({"text/html; charset=utf-8"})
-    public OrderView getOrderDataForm(@CookieParam(TrackingIdFilter.TRACKING_COOKIE_KEY) String trackingId) 
+    public OrderView getOrderDataForm(@CookieParam(TrackingIdFilter.TRACKING_COOKIE_KEY) String trackingId,
+    		@BeanParam LoginHandler loginHandler) 
     		throws URISyntaxException {
-    	
-    	return new OrderView("orderData.ftl", cartService.getOrCreateCartByTrackingId(trackingId));
+    	    	
+    	loginHandler.setConfig(configuration.getOsiamLogin());
+    	Cart cart = cartService.getOrCreateCartByTrackingId(trackingId);
+    	cartService.prefillOrderData(cart, loginHandler);
+    	return new OrderView("orderData.ftl", cart);
     }
     
-    /**
+	/**
      * returns the order form
      * @return
      * @throws URISyntaxException
@@ -102,7 +117,8 @@ public class OrderResource {
     public Response saveOrderDataForm(
     		@CookieParam(TrackingIdFilter.TRACKING_COOKIE_KEY) String trackingId,
     		@BeanParam OrderData orderData,
-    		@FormParam("goBack") String goBackAction) 
+    		@FormParam("goBack") String goBackAction,
+    		@BeanParam LoginHandler loginHandler) 
     		throws URISyntaxException {
     	
     	Cart cart = cartService.getOrCreateCartByTrackingId(trackingId);
@@ -118,9 +134,16 @@ public class OrderResource {
     	if (validationErrors.size() > 0) { // show errors
     		return Response.ok().entity(new OrderView("orderData.ftl", cart, validationErrors)).build();
     	}
-    	
-    	// go to next page
-    	return Response.seeOther(new URI("/orderPay")).build();
+
+    	// on precash go to paypal and place the order later
+    	if (PAYPAL.equals(orderData.getPaymentType())) {
+	    	return Response.seeOther(new URI("http://www.paypal.de")).build();
+    	}
+
+    	// otherwise (on precash) place the order and go to order confirmation page
+    	loginHandler.setConfig(configuration.getOsiamLogin());
+    	String orderId = cartService.placeOrder(cart, loginHandler);
+    	return Response.seeOther(new URI("/shop/orderConfirmation/"+ orderId)).build();
     }
 
 	private List<ValidationError> validate(OrderData orderData) {
@@ -128,6 +151,28 @@ public class OrderResource {
     	if (!orderData.isAgb()) {
     		validationErrors.add(new ValidationError("agb", "Die AGB müssen akzeptiert werden."));
     	}
+    	if (! PAYPAL.equals(orderData.getPaymentType())
+    			&& ! PRECASH.equals(orderData.getPaymentType())) {
+    		validationErrors.add(new ValidationError("paymentType", "Es muss ein Bezahlweg ausgewählt werden"));
+    	}
 		return validationErrors;
 	}
+	
+    /**
+     * returns the order form
+     * @return
+     * @throws URISyntaxException
+     */
+    @Timed
+    @GET
+    @Path("/orderConfirmation/:orderId")
+    @Produces({"text/html; charset=utf-8"})
+    public OrderView getOrderConfirmation(
+    		@QueryParam("orderId") String orderId) 
+    		throws URISyntaxException {
+    	    	
+//    	Cart cart = cartService.getOrCreateCartByTrackingId(trackingId);
+//    	cartService.prefillOrderData(cart, loginHandler);
+    	return new OrderView("orderConfirmation.ftl", null);
+    }
 }
