@@ -11,6 +11,7 @@ public class OrderView extends View {
 
 	private Cart cart;
 	private List<ValidationError> validationErrors;
+	private String paymentInfo;
 
 	protected OrderView(String template, Cart cart) {
 		super(template, StandardCharsets.UTF_8);
@@ -23,6 +24,13 @@ public class OrderView extends View {
 		this.cart = cart;
 		this.validationErrors = validationErrors;
 	}
+
+	public String getPaymentInfo() {
+		return paymentInfo;
+	}
+	public void setPaymentInfo(String paymentInfo) {
+		this.paymentInfo = paymentInfo;
+	}    
 
 	public Cart getCart() {
 		return cart;

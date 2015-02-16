@@ -3,6 +3,7 @@ package net.mancke.microcart;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Predicate;
 
 import javax.inject.Inject;
@@ -46,6 +47,11 @@ public class CartService {
     	}	
     	return newEmptyCart(trackingId);
 	}
+	
+	public Cart getOrder(String orderId) {
+		RestTemplate restTemplate = new RestTemplate();
+		return restTemplate.getForObject(configuration.getBackendURL() + ORDER_RESOURCE + "/"+ orderId, Cart.class);
+	}
 
 	public void saveCartToBackend(Cart cart) {
 		cart.setTimestampLastUpdated(new DateTime());
@@ -73,11 +79,13 @@ public class CartService {
 	
 			cart.setTimestampLastUpdated(new DateTime());
 			cart.setTimestamp(new DateTime());
-			cart.setId(null);			
+			String cartId = cart.getId();
+			cart.setId(UUID.randomUUID().toString());
+			
 			// save order
 			URI orderLocation = restTemplate.postForLocation(configuration.getBackendURL() + ORDER_RESOURCE, cart);
 			// delete cart
-			restTemplate.delete(configuration.getBackendURL() + CART_RESOURCE + "/" + cart.getId(), cart);
+			restTemplate.delete(configuration.getBackendURL() + CART_RESOURCE + "/" + cartId, cart);
 			
 			//saveOrderDataInAccount(cart)
 			//shopOwnerMailNotify(cart, orderLocation);

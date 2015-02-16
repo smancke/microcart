@@ -40,6 +40,8 @@ public class OrderData {
 
 	@FormParam("agb")
 	private boolean agb;
+	
+	private String payPalCorrelationId;
     
 	public String getFamilyName() {
 		return familyName;
@@ -106,5 +108,11 @@ public class OrderData {
 	}
 	public void setAgb(boolean agb) {
 		this.agb = agb;
-	}    
+	}
+	public String getPayPalCorrelationId() {
+		return payPalCorrelationId;
+	}
+	public void setPayPalCorrelationId(String payPalCorrelationId) {
+		this.payPalCorrelationId = payPalCorrelationId;
+	}
 }

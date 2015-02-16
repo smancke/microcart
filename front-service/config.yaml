@@ -1,5 +1,21 @@
 
 backendURL: $env:BACKEND_URL:http://172.17.42.1:5001
+precashPaymentInfo: |
+  Bitte überweise den Betrag von <b>{amount} EUR</b> auf das folgende Konto:
+  <br/><br><b>Empfänger:</b> Micky Maus
+  <br/><b>Verwendungszweck: </b>bs-{orderId}
+  <br/><b>IBAN:</b> 0123456789
+  <br/><b>BIC:</b> DESDCSDC
+  <br/><br/>
+
+payPal:
+  apiUrl: https://api-3t.sandbox.paypal.com/nvp
+  redirectUrl: https://www.sandbox.paypal.com/webscr
+  user: info-facilitator_api1.bilderbuch-stoff.de
+  pwd: FUUPTNBXCF3DQN3R
+  signature: AIzkPgV0CKFumFbqREmlN1svrS-MAtkUOtGFZ6TXz23GBWcUQAI1ylWf
+  returnBaseUrl: http://127.0.0.1:5000/shop/paypalSuccess
+  cancelBaseUrl: http://127.0.0.1:5000/shop/orderData
 
 osiamLogin:
   authServerEndpoint: $env:OSIAM_AUTH_SERVER_HOME:http://127.0.0.1:5101/osiam-auth-server/

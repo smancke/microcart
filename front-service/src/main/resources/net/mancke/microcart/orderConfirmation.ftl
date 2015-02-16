@@ -2,8 +2,10 @@
 
 <#setting locale="de_DE">
 
-    <div container">
-	    <h1>Bestellung erfolgt</h1>
-		<p>Herzlichen Glückwunsch, die Bestellung wurde abgeschickt</p>        
-	</div>    
+    <div class="container">
+	    <h1>Bestellung erfolgt!</h1>
+		<p>Herzlichen Glückwunsch, die Bestellung wurde erfolgreich aufgegeben.</p>
+		
+		<#if paymentInfo??>${paymentInfo}</#if>
+	</div>
 <!--# include virtual="/_footer" -->

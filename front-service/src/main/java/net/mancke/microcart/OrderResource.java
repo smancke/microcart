@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -16,6 +17,7 @@ import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -33,6 +35,7 @@ import net.mancke.microcart.model.Cart;
 import net.mancke.microcart.model.OrderData;
 import net.mancke.microcart.model.Position;
 import net.mancke.microcart.osiam.LoginHandler;
+import net.mancke.microcart.paypal.PayPalClient;
 
 import com.codahale.metrics.annotation.Timed;
 
@@ -137,7 +140,10 @@ public class OrderResource {
 
     	// on precash go to paypal and place the order later
     	if (PAYPAL.equals(orderData.getPaymentType())) {
-	    	return Response.seeOther(new URI("http://www.paypal.de")).build();
+    		PayPalClient payPal = new PayPalClient(configuration.getPayPal(), cart);
+    		payPal.startTransaction();
+    		  
+	    	return Response.seeOther(payPal.getRedirectUri()).build();
     	}
 
     	// otherwise (on precash) place the order and go to order confirmation page
@@ -146,6 +152,65 @@ public class OrderResource {
     	return Response.seeOther(new URI("/shop/orderConfirmation/"+ orderId)).build();
     }
 
+	/**
+     * returns the order success view
+     * @return
+     * @throws URISyntaxException
+     */
+    @Timed
+    @GET //but not save as it should be for ReST
+    @Path("/paypalSuccess")
+    @Produces({"text/html; charset=utf-8"})
+    public Response getOrderConfirmationPaypal (
+    		@CookieParam(TrackingIdFilter.TRACKING_COOKIE_KEY) String trackingId,
+    		@QueryParam("token") String token,
+    		@QueryParam("PayerID") String payerid,
+    		@BeanParam LoginHandler loginHandler) 
+    		throws URISyntaxException {
+
+    	loginHandler.setConfig(configuration.getOsiamLogin());
+
+    	Cart cart = cartService.getOrCreateCartByTrackingId(trackingId);
+    	
+    	PayPalClient payPal = new PayPalClient(configuration.getPayPal(), cart);
+		String payPalCorrelationId = payPal.endTransaction(token, payerid);
+		
+		cart.getOrderData().setPayPalCorrelationId(payPalCorrelationId);
+    	String orderId = cartService.placeOrder(cart, loginHandler);
+    	return Response.seeOther(new URI("/shop/orderConfirmation/"+ orderId)).build();
+    }
+    
+    /**
+     * returns the order success view
+     * @return
+     * @throws URISyntaxException
+     */
+    @Timed
+    @GET
+    @Path("/orderConfirmation/{orderId}")
+    @Produces({"text/html; charset=utf-8"})
+    public OrderView getOrderConfirmation(
+    		@PathParam("orderId") String orderId) 
+    		throws URISyntaxException {
+
+
+    	Cart cart = cartService.getOrder(orderId);
+    	if (cart == null || cart.getId() == null) {
+    		throw new RuntimeException("no such order "+ orderId);
+    	}
+    	
+		OrderView orderView = new OrderView("orderConfirmation.ftl", cart);
+
+    	if (PRECASH.equals(cart.getOrderData().getPaymentType())) {
+    		orderView.setPaymentInfo(
+    				configuration.getPrecashPaymentInfo()
+    					.replace("{amount}", String.format(Locale.GERMAN, "%.2f", cart.getTotalPrice()))
+            		    .replace("{orderId}", orderId.substring(0, 5))
+    				);
+    	}
+    	return orderView;
+    }
+    
 	private List<ValidationError> validate(OrderData orderData) {
 		List<ValidationError> validationErrors = new ArrayList<ValidationError>();
     	if (!orderData.isAgb()) {
@@ -156,23 +221,6 @@ public class OrderResource {
     		validationErrors.add(new ValidationError("paymentType", "Es muss ein Bezahlweg ausgewählt werden"));
     	}
 		return validationErrors;
-	}
-	
-    /**
-     * returns the order form
-     * @return
-     * @throws URISyntaxException
-     */
-    @Timed
-    @GET
-    @Path("/orderConfirmation/:orderId")
-    @Produces({"text/html; charset=utf-8"})
-    public OrderView getOrderConfirmation(
-    		@QueryParam("orderId") String orderId) 
-    		throws URISyntaxException {
-    	    	
-//    	Cart cart = cartService.getOrCreateCartByTrackingId(trackingId);
-//    	cartService.prefillOrderData(cart, loginHandler);
-    	return new OrderView("orderConfirmation.ftl", null);
-    }
+	}	
+
 }
