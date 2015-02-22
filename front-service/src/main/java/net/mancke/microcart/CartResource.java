@@ -139,6 +139,7 @@ public class CartResource {
     	ArticleService articleService = new ArticleService(configuration);
     	ArticleService.Article article = articleService.getArticle(articleId);
     	position.setPricePerUnit(article.getPrice());
+    	position.setDiscountPercent(article.getDiscount());
     	position.setImageUrl(article.getImg_thumb());
     	position.setTitle(article.getTitle());
     	

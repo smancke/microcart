@@ -1,6 +1,9 @@
 
 backendURL: $env:backend_url:http://172.17.42.1:5001
-precashPaymentInfo: $env:$precash_payment_info:Bitte überweise den Betrag von <b>{amount} EUR</b> auf das folgende Konto ...
+precashPaymentInfo: $env:precash_payment_info:Bitte überweise den Betrag von <b>{amount} EUR</b> auf das folgende Konto ...
+shippingCosts: $env:shipping_costs:4.90
+shippingCostLimit: $env:shipping_cost_limit:80
+orderSuccessMailSubject: $env:order_success_mail_subject:Bestätigung der Bestellung
 
 payPal:
   apiUrl: $env:paypal_api_url:https://api-3t.sandbox.paypal.com/nvp
@@ -15,8 +18,8 @@ osiamLogin:
   authServerEndpoint: $env:osiam_auth_server_home:http://172.17.42.1:5004/osiam-auth-server/
   resourceServerEndpoint: $env:osiam_resource_server_home:http://172.17.42.1:5004/osiam-resource-server/
   clientId: $env:osiam_client_id:bsweb
-  clientSecret: $env:osiam_client_secret:ksdlcmsdlcmsldk
-  sessionCookieSecret: $env:session_secret:e2l21$%678bdwkml
+  clientSecret: $env:osiam_client_secret:trdjnlkmzt23d21
+  sessionCookieSecret: $env:session_secret:secretsecretsecretsecretsecretse
   sessionLifetimeMinutes: $env:session_lifetime_minutes:180
 
 server:
@@ -25,7 +28,7 @@ server:
       port: 5003
   adminConnectors:
     - type: http
-      port: 5004
+      port: 5103
 
 logging:
 

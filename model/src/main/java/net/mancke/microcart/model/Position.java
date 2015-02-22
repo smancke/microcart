@@ -7,6 +7,7 @@ public class Position {
 	String imageUrl;
 	float quantity;
 	float pricePerUnit;
+	float discountPercent;
 	
 	public String getArticleId() {
 		return articleId;
@@ -40,5 +41,11 @@ public class Position {
 	}
 	public float getPositionPrice() {
 		return pricePerUnit * quantity;
+	}
+	public float getDiscountPercent() {
+		return discountPercent;
+	}
+	public void setDiscountPercent(float discountPercent) {
+		this.discountPercent = discountPercent;
 	}
 }

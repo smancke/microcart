@@ -2,8 +2,26 @@
 
 <#setting locale="de_DE">
 
-    <div class="form-container container">
+    <div class="form-container container order-register">
     <h1>Bestellung</h1>
+
+  	<form autocomplete="off" method="GET" action="/shop/orderData">
+      <section class="form-part">
+        <h3><small>Zur Dateneingabe</small></h3>
+        <ul class="form-fields">
+          <li class="form-field-group">
+             <div class="form-field clearfix">	
+	          <input type="submit" value="Ohne Account bestellen &gt;&gt;" class="btn btn-lg  btn-primary"/>          
+			 </div>
+          </li>          
+          <li class="form-field-group">
+	          <div class="form-field">	
+	          	<hr/>
+	          </div>
+          </li>
+	   </ul>
+	  </section>
+    </form>
 
  	<form autocomplete="off" method="POST" action="/login">
  	  <input type="hidden" name="forwardURL" value="/shop/orderData">
@@ -27,28 +45,10 @@
 	          <input type="submit" value="Login &gt;&gt;" class="btn btn-lg  btn-primary"/>          
 			 </div>
           </li>
-          <li class="form-field-group">
-	          <div class="form-field">	
-	          	<hr/>
-	          </div>
-          </li>
 	   </ul>
 	  </section>
     </form>
-            
-  	<form autocomplete="off" method="GET" action="/shop/orderData">
-      <section class="form-part">
-        <h3><small>Zur Dateneingabe</small></h3>
-        <ul class="form-fields">
-          <li class="form-field-group">
-             <div class="form-field">	
-	          <input type="submit" value="Ohne Account bestellen &gt;&gt;" class="btn btn-lg  btn-primary"/>          
-			 </div>
-          </li>          
-	   </ul>
-	  </section>
-    </form>
-        
+                    
     </div> 
     
 <!--# include virtual="/_footer" -->

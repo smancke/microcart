@@ -157,7 +157,7 @@ public class LoginHandler {
             AuthCookie authCookie = new ObjectMapper().readValue(decryptedValue, AuthCookie.class);
             return authCookie;
         } catch (Exception e) {
-            logger.info("invalid session cookie", e);
+            logger.trace("invalid session cookie", e);
             return null;
         }
     }

@@ -11,9 +11,18 @@ public class FrontConfiguration extends Configuration {
 
 	@JsonProperty
     private String backendURL = "http://127.0.0.1:5001";
+
+	@JsonProperty
+	private float shippingCosts;
+
+	@JsonProperty
+	private float shippingCostLimit;
 	
 	@JsonProperty
 	private String precashPaymentInfo;
+	
+	@JsonProperty
+	private String orderSuccessMailSubject;
     
     @JsonProperty
     private OsiamLoginConfiguration osiamLogin;
@@ -51,6 +60,30 @@ public class FrontConfiguration extends Configuration {
 
 	public void setPrecashPaymentInfo(String precashPaymentInfo) {
 		this.precashPaymentInfo = precashPaymentInfo;
+	}
+
+	public float getShippingCosts() {
+		return shippingCosts;
+	}
+
+	public void setShippingCosts(float shippingCosts) {
+		this.shippingCosts = shippingCosts;
+	}
+
+	public float getShippingCostLimit() {
+		return shippingCostLimit;
+	}
+
+	public void setShippingCostLimit(float shippingCostLimit) {
+		this.shippingCostLimit = shippingCostLimit;
+	}
+
+	public String getOrderSuccessMailSubject() {
+		return orderSuccessMailSubject;
+	}
+
+	public void setOrderSuccessMailSubject(String orderSuccessMailSubject) {
+		this.orderSuccessMailSubject = orderSuccessMailSubject;
 	}
 
 }

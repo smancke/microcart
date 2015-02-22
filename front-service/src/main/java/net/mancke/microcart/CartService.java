@@ -42,6 +42,9 @@ public class CartService {
 		if (trackingId != null && ! trackingId.isEmpty()) {
     		Cart cart = loadCartFromBackend(trackingId);
     		if (cart != null) {
+        		// set the configuration values here, if we changed this
+        		cart.setShippingCosts(configuration.getShippingCosts());
+        		cart.setShippingCostLimit(configuration.getShippingCostLimit());
     			return cart;
     		}
     	}	
@@ -86,14 +89,16 @@ public class CartService {
 			URI orderLocation = restTemplate.postForLocation(configuration.getBackendURL() + ORDER_RESOURCE, cart);
 			// delete cart
 			restTemplate.delete(configuration.getBackendURL() + CART_RESOURCE + "/" + cartId, cart);
+						
+			logger.info("placed order "+orderLocation );
+			String[] urlParts = orderLocation.toString().split("/");
+			String orderId = urlParts[urlParts.length-1];
 			
 			//saveOrderDataInAccount(cart)
 			//shopOwnerMailNotify(cart, orderLocation);
-			//userMailNotify(cart, orderLocation);
+			userMailNotify(cart, orderId);
 			
-			logger.info("placed order "+orderLocation );
-			String[] urlParts = orderLocation.toString().split("/");
-			return urlParts[urlParts.length-1];
+			return orderId;
 		} catch (RuntimeException e) {
 			try {
 				logger.error("Error while placing order. Order Content: "+ new ObjectMapper().writeValueAsString(cart), e);
@@ -102,6 +107,21 @@ public class CartService {
 			}
 			throw e;
 		}
+	}
+
+	private void userMailNotify(Cart cart, String orderId) {
+		TemplateEngine te = new TemplateEngine(configuration);
+		String body = te.renderTemplate(
+				"orderConfirmationMail.ftl", cart,
+				te.renderPrecashPaymentInfo(cart, orderId).replaceAll("\\<[^>]*>","") 
+				);
+        RestTemplate restTemplate = new RestTemplate();
+        System.out.println(body);
+        restTemplate.postForLocation(configuration.getBackendURL() + "/mail"
+                + "/self"
+        		+ "/"+cart.getOrderData().getEmail()
+                + "/"+configuration.getOrderSuccessMailSubject(),
+                body);
 	}
 
 	private Cart loadCartFromBackend(String trackingId) {
@@ -117,7 +137,7 @@ public class CartService {
 	}
     
 	private Cart newEmptyCart(String trackingId) {
-		Cart cart = new Cart();
+		Cart cart = new Cart(configuration.getShippingCosts(), configuration.getShippingCostLimit());
 		cart.setId(trackingId);
 		return cart;
 	}

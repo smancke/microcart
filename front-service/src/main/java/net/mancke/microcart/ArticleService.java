@@ -23,6 +23,7 @@ public class ArticleService {
 	    private String title;
 	    private String img_thumb;
 	    private float price;
+	    private float discount;	    
 	    
 	    public String getId() {
 	        return id;
@@ -54,6 +55,14 @@ public class ArticleService {
 	
 		public void setPrice(float price) {
 			this.price = price;
+		}
+
+		public float getDiscount() {
+			return discount;
+		}
+
+		public void setDiscount(float discount) {
+			this.discount = discount;
 		}
 	}
 }

@@ -46,10 +46,6 @@ import com.codahale.metrics.annotation.Timed;
 public class OrderResource {
 
     private static final String ORDER_RESOURCE = "/shop/order";
-
-	private static final Object PAYPAL = "paypal";
-
-	private static final Object PRECASH = "preCash";
     
 	/**
      * The global configuration.
@@ -139,7 +135,7 @@ public class OrderResource {
     	}
 
     	// on precash go to paypal and place the order later
-    	if (PAYPAL.equals(orderData.getPaymentType())) {
+    	if (Cart.PAYPAL.equals(orderData.getPaymentType())) {
     		PayPalClient payPal = new PayPalClient(configuration.getPayPal(), cart);
     		payPal.startTransaction();
     		  
@@ -200,14 +196,9 @@ public class OrderResource {
     	}
     	
 		OrderView orderView = new OrderView("orderConfirmation.ftl", cart);
-
-    	if (PRECASH.equals(cart.getOrderData().getPaymentType())) {
-    		orderView.setPaymentInfo(
-    				configuration.getPrecashPaymentInfo()
-    					.replace("{amount}", String.format(Locale.GERMAN, "%.2f", cart.getTotalPrice()))
-            		    .replace("{orderId}", orderId.substring(0, 5))
-    				);
-    	}
+		
+    	orderView.setPaymentInfo(new TemplateEngine(configuration).renderPrecashPaymentInfo(cart, orderId));
+        	
     	return orderView;
     }
     
@@ -216,8 +207,8 @@ public class OrderResource {
     	if (!orderData.isAgb()) {
     		validationErrors.add(new ValidationError("agb", "Die AGB müssen akzeptiert werden."));
     	}
-    	if (! PAYPAL.equals(orderData.getPaymentType())
-    			&& ! PRECASH.equals(orderData.getPaymentType())) {
+    	if (! Cart.PAYPAL.equals(orderData.getPaymentType())
+    			&& ! Cart.PRECASH.equals(orderData.getPaymentType())) {
     		validationErrors.add(new ValidationError("paymentType", "Es muss ein Bezahlweg ausgewählt werden"));
     	}
 		return validationErrors;
