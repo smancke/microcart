@@ -1,6 +1,7 @@
 package net.mancke.microcart;
 
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -19,11 +20,15 @@ import org.osiam.resources.scim.PhoneNumber;
 import org.osiam.resources.scim.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 
 public class CartService {
 
@@ -95,9 +100,9 @@ public class CartService {
 			String orderId = urlParts[urlParts.length-1];
 			
 			//saveOrderDataInAccount(cart)
-			//shopOwnerMailNotify(cart, orderLocation);
 			userMailNotify(cart, orderId);
-			
+			shopOwnerNotify(cart, orderId);
+
 			return orderId;
 		} catch (RuntimeException e) {
 			try {
@@ -115,13 +120,47 @@ public class CartService {
 				"orderConfirmationMail.ftl", cart,
 				te.renderPrecashPaymentInfo(cart, orderId).replaceAll("\\<[^>]*>","") 
 				);
-        RestTemplate restTemplate = new RestTemplate();
-        System.out.println(body);
-        restTemplate.postForLocation(configuration.getBackendURL() + "/mail"
-                + "/self"
-        		+ "/"+cart.getOrderData().getEmail()
-                + "/"+configuration.getOrderSuccessMailSubject(),
-                body);
+		String uri = configuration.getBackendURL() + "/mail"
+		    + "/self"
+		    + "/"+cart.getOrderData().getEmail()
+		    + "/"+configuration.getOrderSuccessMailSubject();
+		postPlainText(uri, body);
+	}
+
+	private void shopOwnerNotify(Cart cart, String orderId) {
+		String name = 
+				cart.getOrderData().getGivenName()
+				+ " "
+				+ cart.getOrderData().getFamilyName();
+		
+		String subject = "Bestellung von " + name + orderId;
+
+		ObjectWriter mapper = new ObjectMapper().writerWithDefaultPrettyPrinter();
+		StringBuilder body = new StringBuilder();
+		try {
+		    body
+			.append(name)
+			.append("Preis: ").append(cart.getTotalPrice())
+			.append("\n\n")
+			.append(mapper.writeValueAsString(cart.getPositions()))
+			.append(mapper.writeValueAsString(cart.getOrderData()));
+		} catch (Exception e) {
+		    logger.error("error constructing shopOwnerNotify mail body", e);
+		}
+
+		String uri = configuration.getBackendURL() + "/mail"
+		    + "/" + cart.getOrderData().getEmail()
+		    + "/self"
+		    + "/"+subject;
+		postPlainText(uri, body.toString());
+	}
+
+	private void postPlainText(String uri, String body) {
+		RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("text", "plain", Charset.forName("UTF-8")));
+        restTemplate.postForLocation(uri,
+                new HttpEntity<String>(body, headers));
 	}
 
 	private Cart loadCartFromBackend(String trackingId) {
