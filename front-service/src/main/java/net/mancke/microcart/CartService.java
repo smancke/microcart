@@ -133,16 +133,17 @@ public class CartService {
 				+ " "
 				+ cart.getOrderData().getFamilyName();
 		
-		String subject = "Bestellung von " + name + orderId;
+		String subject = "Bestellung von " + name + ": "+ orderId.substring(0, 5);
 
 		ObjectWriter mapper = new ObjectMapper().writerWithDefaultPrettyPrinter();
 		StringBuilder body = new StringBuilder();
 		try {
 		    body
-			.append(name)
+			.append(name).append("\n")
 			.append("Preis: ").append(cart.getTotalPrice())
 			.append("\n\n")
 			.append(mapper.writeValueAsString(cart.getPositions()))
+			.append("\n\n")
 			.append(mapper.writeValueAsString(cart.getOrderData()));
 		} catch (Exception e) {
 		    logger.error("error constructing shopOwnerNotify mail body", e);
