@@ -13,6 +13,7 @@ import javax.ws.rs.core.Context;
 
 import org.osiam.client.OsiamConnector;
 import org.osiam.client.exception.ConnectionInitializationException;
+import org.osiam.client.exception.UnauthorizedException;
 import org.osiam.client.oauth.AccessToken;
 import org.osiam.client.oauth.Scope;
 import org.osiam.resources.scim.GroupRef;
@@ -103,11 +104,14 @@ public class LoginHandler {
             List<GroupRef> groups = user.getGroups();
 
             writeCookie(user, groups);
+        } catch (UnauthorizedException uae) {
+        	logger.info("loin failed (UnauthorizedException) for "+req.getParameter("username"));
+        	return false;
         } catch (ConnectionInitializationException cie) {
-            if (cie.getCause() != null) {
-                throw new RuntimeException("error on login", cie.getCause());
-            }
-            return false;
+        	if (cie.getMessage().contains("doesn't exist") || cie.getMessage().contains("Bad credentials") ) {
+        		return false;
+        	}
+        	throw new RuntimeException("error on login for "+req.getParameter("username"), cie);
         }
         return true;
     }

@@ -6,7 +6,7 @@
         <h1>Einkaufswagen <small></small></h1>        
         
         <#if cart.positions?size == 0 >
-           <p class="bs-big-font">Es befinden sich keine Artikel in Deinem Einkaufswagen</p> 
+           <p class="bs-big-font">Es befinden sich keine Artikel in deinem Einkaufswagen</p> 
         <#else> 
 	        <div class="row cart-bottom-row">
 			        <div class="cart-order">

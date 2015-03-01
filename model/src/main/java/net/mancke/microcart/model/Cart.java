@@ -20,6 +20,7 @@ public class Cart {
 	private OrderData orderData = new OrderData();
     private DateTime timestamp = new DateTime();
     private DateTime timestampLastUpdated = new DateTime();
+    private PostProcessing postProcessing = new PostProcessing();
     
     public Cart(float shippingCosts, float shippingCostLimit) {
     	this.shippingCosts = shippingCosts;
@@ -140,5 +141,13 @@ public class Cart {
 	}
 	public void setShippingCostLimit(float shippingCostLimit) {
 		this.shippingCostLimit = shippingCostLimit;
+	}
+
+	public PostProcessing getPostProcessing() {
+		return postProcessing;
+	}
+
+	public void setPostProcessing(PostProcessing postProcessing) {
+		this.postProcessing = postProcessing;
 	}
 }

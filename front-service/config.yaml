@@ -4,6 +4,7 @@ precashPaymentInfo: $env:precash_payment_info:Bitte überweise den Betrag von <b
 shippingCosts: $env:shipping_costs:4.90
 shippingCostLimit: $env:shipping_cost_limit:80
 orderSuccessMailSubject: $env:order_success_mail_subject:Bestätigung der Bestellung
+mailCheckFrom: $env:mail_check_from:root@localhost
 
 payPal:
   apiUrl: $env:paypal_api_url:https://api-3t.sandbox.paypal.com/nvp

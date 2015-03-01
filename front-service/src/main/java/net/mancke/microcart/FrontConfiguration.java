@@ -30,6 +30,9 @@ public class FrontConfiguration extends Configuration {
     @JsonProperty
     private PayPalConfiguration payPal;
     
+    @JsonProperty
+    private String mailCheckFrom;
+    
 	public String getBackendURL() {
 		return backendURL;
 	}
@@ -84,6 +87,14 @@ public class FrontConfiguration extends Configuration {
 
 	public void setOrderSuccessMailSubject(String orderSuccessMailSubject) {
 		this.orderSuccessMailSubject = orderSuccessMailSubject;
+	}
+
+	public String getMailCheckFrom() {
+		return mailCheckFrom;
+	}
+
+	public void setMailCheckFrom(String mailCheckFrom) {
+		this.mailCheckFrom = mailCheckFrom;
 	}
 
 }

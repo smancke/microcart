@@ -1,13 +1,13 @@
 package net.mancke.microcart;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
-
-import javax.inject.Inject;
 
 import net.mancke.microcart.model.Cart;
 import net.mancke.microcart.model.OrderData;
@@ -82,35 +82,65 @@ public class CartService {
 	 * @return the id of the placed order
 	 */
 	public String placeOrder(Cart cart, LoginHandler loginHandler) {
+		RestTemplate restTemplate = new RestTemplate();
+
+		cart.setTimestampLastUpdated(new DateTime());
+		cart.setTimestamp(new DateTime());
+		String cartId = cart.getId();
+		cart.setId(UUID.randomUUID().toString());
+		
+		String orderId = null;
+		URI orderLocation = null;
 		try {
-			RestTemplate restTemplate = new RestTemplate();
-	
-			cart.setTimestampLastUpdated(new DateTime());
-			cart.setTimestamp(new DateTime());
-			String cartId = cart.getId();
-			cart.setId(UUID.randomUUID().toString());
-			
 			// save order
-			URI orderLocation = restTemplate.postForLocation(configuration.getBackendURL() + ORDER_RESOURCE, cart);
-			// delete cart
-			restTemplate.delete(configuration.getBackendURL() + CART_RESOURCE + "/" + cartId, cart);
+			orderLocation = restTemplate.postForLocation(configuration.getBackendURL() + ORDER_RESOURCE, cart);
 						
 			logger.info("placed order "+orderLocation );
 			String[] urlParts = orderLocation.toString().split("/");
-			String orderId = urlParts[urlParts.length-1];
-			
-			//saveOrderDataInAccount(cart)
-			userMailNotify(cart, orderId);
-			shopOwnerNotify(cart, orderId);
-
-			return orderId;
+			orderId = urlParts[urlParts.length-1];			
 		} catch (RuntimeException e) {
-			try {
-				logger.error("Error while placing order. Order Content: "+ new ObjectMapper().writeValueAsString(cart), e);
-			} catch (JsonProcessingException jsonExecption) {
-				logger.error("Error while serializing order for user: "+ cart.getUserId(), e);
-			}
+			logger.error("Error while placing order. Order Content: "+ saveToString(cart), e);
 			throw e;
+		}
+		
+		try {
+			// delete cart
+			restTemplate.delete(configuration.getBackendURL() + CART_RESOURCE + "/" + cartId);
+		} catch (RuntimeException e) {
+			logger.error("Error while deleting the shopping cart after order."+ saveToString(cart), e);
+			// do not escalate here
+		}
+
+		// TODO:
+		//saveOrderDataInAccount(cart)
+
+		try {
+			userMailNotify(cart, orderId);
+			// update the mail sent flag in the order
+			Cart order = restTemplate.getForObject(configuration.getBackendURL() + orderLocation, Cart.class);
+			order.getPostProcessing().setUserConfirmationMailSent(true);
+			restTemplate.put(configuration.getBackendURL() + orderLocation, cart);
+		} catch (RuntimeException e) {
+			logger.error("User mail notification lead to an error."+ saveToString(cart), e);
+			// do not escalate here
+		}
+		
+		try {
+			shopOwnerNotify(cart, orderId);
+		} catch (RuntimeException e) {
+			logger.error("Shop owner notify atter order lead to an error."+ saveToString(cart), e);
+			// do not escalate here
+		}
+		
+		return orderId;
+	}
+
+	private String saveToString(Cart cart) {
+		try {
+			return new ObjectMapper().writeValueAsString(cart);
+		} catch (JsonProcessingException jsonExecption) {
+			logger.error("Error while serializing order for user: "+ cart.getUserId(), jsonExecption);
+			return "";
 		}
 	}
 
@@ -122,8 +152,8 @@ public class CartService {
 				);
 		String uri = configuration.getBackendURL() + "/mail"
 		    + "/self"
-		    + "/"+cart.getOrderData().getEmail()
-		    + "/"+configuration.getOrderSuccessMailSubject();
+		    + "/"+encode(cart.getOrderData().getEmail())
+		    + "/"+encode(configuration.getOrderSuccessMailSubject());
 		postPlainText(uri, body);
 	}
 
@@ -150,9 +180,9 @@ public class CartService {
 		}
 
 		String uri = configuration.getBackendURL() + "/mail"
-		    + "/" + cart.getOrderData().getEmail()
+		    + "/" + encode(cart.getOrderData().getEmail())
 		    + "/self"
-		    + "/"+subject;
+		    + "/"+encode(subject);
 		postPlainText(uri, body.toString());
 	}
 
@@ -255,5 +285,14 @@ public class CartService {
 
 	private boolean empty(String string) {
 		return string == null || string.isEmpty();
+	}
+
+	private String encode(String text) {
+		try {
+			return URLEncoder.encode(text, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			// UTF-8 is always there 
+			return null;
+		}
 	}
 }

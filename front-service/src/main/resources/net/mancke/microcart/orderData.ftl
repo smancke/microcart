@@ -6,30 +6,30 @@
 <#escape x as x?html>
     <div class="form-container container">
         <h1>Bestellung</h1>
+
+  	<form autocomplete="on" method="POST" name="/shop/orderData" novalidate>
         
-    <#if validationErrors?? && validationErrors?size != 0>
-      <div class="alert alert-danger" >
-        <ul>
-	    <#list validationErrors as error>
-	    	<li>${error.message}</li>
-	    </#list>
-	    </ul>
-	  </div>
-	</#if>    
-  	<form autocomplete="on" method="POST" name="/shop/orderData">
+	    <#if validationErrors?? && validationErrors?size != 0>
+	      <div class="alert alert-danger" >
+	       Bitte überprüfe Deine Daten:
+	        <ul>
+	        <#noescape>
+			    <#list validationErrors as error>
+			    	<li>${error.message}</li>
+			    </#list>
+		    </#noescape>
+		    </ul>
+		    <#list validationErrors as error>
+		        <#if error.fieldId == 'emailWarning'>
+		        	<br>Sollt die E-Mail Adresse dennoch korrekt sein, bitte folgendes markieren:
+		        	<br><input type="checkbox" class="form-control" id="forceEmail" name="forceEmail" value="true"/><label for="forceEmail">Die eingegebene E-Mail Adresse ist so korrekt.</label>
+		    	</#if>
+		    </#list>
+		  </div>
+		</#if>
       <section class="form-part">
         <h3>Persönliche Daten</h3>
         <ul class="form-fields">
-          <li class="form-field-group">
-            <div class="form-field">	
-	          	<label for="honorificPrefix">Anrede</label>
-			    <select class="form-control" id="honorificPrefix" name="honorificPrefix" class="salutation-select">
-	              <option value=""<#if d.honorificPrefix?? && d.honorificPrefix == ''> selected</#if>></option>
-	              <option value="Herr"<#if d.honorificPrefix?? && d.honorificPrefix == 'Herr'> selected</#if>>Herr</option>
-	              <option value="Frau"<#if d.honorificPrefix?? && d.honorificPrefix == 'Frau'> selected</#if>>Frau</option>
-	            </select>
-	        </div>
-          </li>
           <li class="form-field-group">
              <div class="form-field">
 	          <label for="givenName" class="required">Vorname</label>
@@ -84,7 +84,7 @@
           </li>
           <li>
             <div class="form-field">
-	          	<input type="radio" class="form-control" id="preCash" name="paymentType" value="preCash"<#if d.paymentType?? && d.paymentType == 'preCash'> checked</#if>/><label for="preCash">Überweisung/Vorkasse</label>
+	          	<input type="radio" class="form-control" id="paymentType" name="paymentType" value="preCash"<#if d.paymentType?? && d.paymentType == 'preCash'> checked</#if>/><label for="paymentType">Überweisung/Vorkasse</label>
             </div>
           </li>
         </ul>
@@ -125,3 +125,15 @@
     
 </#escape>
 <!--# include virtual="/_footer" -->
+
+<#if validationErrors?? && validationErrors?size != 0>
+    <script type="text/javascript">
+    	$(function() {
+    	    $('.form-field').addClass('has-success');
+	    	<#list validationErrors as error>
+			   $('#${error.fieldId}').parent().removeClass('has-success');
+	    	   $('#${error.fieldId}').parent().addClass('has-error');
+		    </#list>
+    	});
+    </script>
+</#if>

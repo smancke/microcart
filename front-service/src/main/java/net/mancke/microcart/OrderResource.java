@@ -4,13 +4,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.function.Predicate;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.FormParam;
@@ -20,20 +15,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-
-import org.osiam.resources.scim.Address;
-import org.osiam.resources.scim.Email;
-import org.osiam.resources.scim.MultiValuedAttribute;
-import org.osiam.resources.scim.PhoneNumber;
-import org.osiam.resources.scim.User;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 
 import net.mancke.microcart.model.Cart;
 import net.mancke.microcart.model.OrderData;
-import net.mancke.microcart.model.Position;
 import net.mancke.microcart.osiam.LoginHandler;
 import net.mancke.microcart.paypal.PayPalClient;
 
@@ -117,14 +102,16 @@ public class OrderResource {
     		@CookieParam(TrackingIdFilter.TRACKING_COOKIE_KEY) String trackingId,
     		@BeanParam OrderData orderData,
     		@FormParam("goBack") String goBackAction,
+    		@FormParam("forceEmail") boolean forceEmail,
     		@BeanParam LoginHandler loginHandler) 
     		throws URISyntaxException {
+    	System.out.println("forceEmail: "+ forceEmail);
     	
     	Cart cart = cartService.getOrCreateCartByTrackingId(trackingId);
     	cart.setOrderData(orderData);
     	cartService.saveCartToBackend(cart);
     	
-    	List<ValidationError> validationErrors = validate(orderData);
+    	List<ValidationError> validationErrors = validate(orderData, forceEmail);
 
     	if (goBackAction != null) { //back button
     		return Response.seeOther(new URI("/shop/my-cart")).build();
@@ -202,16 +189,40 @@ public class OrderResource {
     	return orderView;
     }
     
-	private List<ValidationError> validate(OrderData orderData) {
+	private List<ValidationError> validate(OrderData orderData, boolean forceEmail) {
 		List<ValidationError> validationErrors = new ArrayList<ValidationError>();
     	if (!orderData.isAgb()) {
-    		validationErrors.add(new ValidationError("agb", "Die AGB müssen akzeptiert werden."));
+    		validationErrors.add(new ValidationError("agb", "Die <b>AGB</b> müssen akzeptiert werden."));
     	}
     	if (! Cart.PAYPAL.equals(orderData.getPaymentType())
     			&& ! Cart.PRECASH.equals(orderData.getPaymentType())) {
-    		validationErrors.add(new ValidationError("paymentType", "Es muss ein Bezahlweg ausgewählt werden"));
+    		validationErrors.add(new ValidationError("paymentType", "Es muss ein <b>Bezahlweg</b> ausgewählt werden"));
+    	}
+
+    	addErrorIfEmpty(validationErrors, orderData.getGivenName(), "givenName", "Vorname");
+    	addErrorIfEmpty(validationErrors, orderData.getFamilyName(), "familyName", "Nachname");
+    	addErrorIfEmpty(validationErrors, orderData.getStreetAddress(), "streetAddress", "Straße");
+    	addErrorIfEmpty(validationErrors, orderData.getLocality(), "locality", "Ort");
+    	addErrorIfEmpty(validationErrors, orderData.getPostalCode(), "postalCode", "Postleitzahl");
+
+    	MailBoxValidator mailBoxValidator = new MailBoxValidator(configuration.getMailCheckFrom());
+    	if (! (mailBoxValidator.isEmailSyntaxValid(orderData.getEmail())
+    			&& mailBoxValidator.doesHostExist(orderData.getEmail()))) {
+    		validationErrors.add(new ValidationError("email", "Die <b>E-Mail Adresse</b> ist nicht gültig."));
+    	} else {	    	
+	    	if (! forceEmail && ! mailBoxValidator.mayMailboxExist(orderData.getEmail())) {
+	    		validationErrors.add(new ValidationError("emailWarning", "Die <b>E-Mail Adresse</b> konnte nicht geprüft werden."));
+	    	}
     	}
 		return validationErrors;
-	}	
+	}
+
+	private void addErrorIfEmpty(List<ValidationError> validationErrors,
+			String value, String fieldId, String fieldLabel) {
+		if (value == null
+				|| value.trim().isEmpty()) {
+	    	validationErrors.add(new ValidationError(fieldId, "Das Feld <b>"+ fieldLabel +"</b> darf nicht leer sein"));
+		}		
+	}
 
 }
