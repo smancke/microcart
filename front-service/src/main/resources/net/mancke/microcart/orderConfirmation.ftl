@@ -1,4 +1,4 @@
-<!--# include virtual="/_header?title=Bestellung&page=shop" -->
+<!--# include virtual="/_header?title=Bestellung&page=orderConfirmation" -->
 
 <#setting locale="de_DE">
 

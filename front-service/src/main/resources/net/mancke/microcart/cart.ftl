@@ -1,4 +1,4 @@
-<!--# include virtual="/_header?title=Einkaufswagen&page=shop" -->
+<!--# include virtual="/_header?title=Einkaufswagen&page=cart" -->
 
 <#setting locale="de_DE">
 
