@@ -10,8 +10,11 @@ import javax.naming.directory.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// Basically taken and modified from http://www.rgagnon.com/javadetails/java-0452.html
-// Unknown license
+// Basically taken and modified from rgagnon: 
+// See: http://www.rgagnon.com/javadetails/java-0452.html
+// License: 
+//    http://www.rgagnon.com/varia/faq-e.html#license
+//    There is no restriction to use individual How-To in a development (compiled/source) but a mention is appreciated. 
 public class MailBoxValidator {
 
 	private static final Logger logger = LoggerFactory.getLogger(MailBoxValidator.class);
@@ -19,9 +22,9 @@ public class MailBoxValidator {
 	private String fromDomain;
 	private String fromEmail;
 
-	public MailBoxValidator(String fromDomain, String fromEmail) {
-		this.fromDomain = fromDomain;
+	public MailBoxValidator(String fromEmail) {
 		this.fromEmail = fromEmail;
+		this.fromDomain = fromEmail.substring(fromEmail.indexOf("@")+1);
 	}
 
 	public static void main(String args[]) {
@@ -33,13 +36,28 @@ public class MailBoxValidator {
 				"fail.me@nowhere.spam" // Invalid domain name
 		};
 
-		MailBoxValidator validator = new MailBoxValidator(args[0], args[1]);
+		MailBoxValidator validator = new MailBoxValidator(args[0]);
 		for (int ctr = 0; ctr < testData.length; ctr++) {
 			System.out.println(testData[ctr] + " is valid? "
-					+ validator.isAddressValid(testData[ctr]));
+					+ validator.mayMailboxExist(testData[ctr]));
 		}
 		return;
 	}
+
+	public boolean isEmailSyntaxValid(String email) {
+		return email.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}$");
+	}
+	
+	public boolean doesHostExist(String email) {
+		String host = email.substring(email.indexOf("@")+1);
+		try {
+			Inet4Address.getByName(host);
+		} catch (UnknownHostException e) {
+			logger.info("[mail validation] host of mail does not exist email="+email +" - "+ e.getMessage());
+			return false;
+		}
+		return true;
+	}	
 
 	private ArrayList getMX(String hostName) throws NamingException {
 		// Perform a DNS lookup for MX records in the domain
@@ -81,7 +99,7 @@ public class MailBoxValidator {
 		return res;
 	}
 
-	public boolean isAddressValid( String address ) {
+	public boolean mayMailboxExist( String address ) {
 		
 		// Find the separator for the domain name
 		int pos = address.indexOf( '@' );
@@ -146,7 +164,7 @@ public class MailBoxValidator {
 	         }
 
 	     } catch (Exception e) {
-	    	 logger.info("[mail validation] remote mail validation error accept anyway email="+address +" - "+ e.getMessage());
+	    	 logger.info("[mail validation] remote mail validation error. Accepting email anyway: email="+address +" - "+ e.getMessage());
 	     }
 	     return true;
     }
