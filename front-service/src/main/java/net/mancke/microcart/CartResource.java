@@ -102,6 +102,7 @@ public class CartResource {
     	
     	cart.addDeleteOrUpdatePosition(position);
     	
+    	loginHandler.setConfig(configuration.getOsiamLogin());
     	setUserIdToCart(loginHandler, cart);
     	
     	cartService.saveCartToBackend(cart);
