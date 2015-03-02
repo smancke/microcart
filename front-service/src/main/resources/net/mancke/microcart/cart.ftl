@@ -38,7 +38,7 @@
 		<form class="cart-quantity-form" action="/shop/my-cart/article" method="POST">
 		  <input type="hidden" name="articleId" value="${position.articleId}">
 		  <#setting locale="us_US">
-		    <input type="number" step="0.1" min="0.5" max="500" value="${position.quantity}" class="input-sm form-control" name="quantity" placeholder="m">
+		    <input type="number" step="0.1" min="0.5" max="500" value="${position.quantity}" class="cart-quantity-form-field" name="quantity" placeholder="m">
 		    <#setting locale="de_DE">
 		      <span>m</span>
 		      <button type="submit" class="cart-quantity-form-field btn btn-default btn-sm">
