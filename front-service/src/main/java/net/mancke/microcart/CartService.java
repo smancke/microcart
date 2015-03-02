@@ -150,11 +150,8 @@ public class CartService {
 				"orderConfirmationMail.ftl", cart,
 				te.renderPrecashPaymentInfo(cart, orderId).replaceAll("\\<[^>]*>","") 
 				);
-		String uri = configuration.getBackendURL() + "/mail"
-		    + "/self"
-		    + "/"+encode(cart.getOrderData().getEmail())
-		    + "/"+encode(configuration.getOrderSuccessMailSubject());
-		postPlainText(uri, body);
+		String uri = configuration.getBackendURL() + "/mail/self/{to}/{subject}";
+		postPlainText(uri, body, cart.getOrderData().getEmail(), configuration.getOrderSuccessMailSubject());
 	}
 
 	private void shopOwnerNotify(Cart cart, String orderId) {
@@ -179,19 +176,17 @@ public class CartService {
 		    logger.error("error constructing shopOwnerNotify mail body", e);
 		}
 
-		String uri = configuration.getBackendURL() + "/mail"
-		    + "/" + encode(cart.getOrderData().getEmail())
-		    + "/self"
-		    + "/"+encode(subject);
-		postPlainText(uri, body.toString());
+		String uri = configuration.getBackendURL() + "/mail/{from}/self/{subject}";
+		postPlainText(uri, body.toString(), cart.getOrderData().getEmail(), subject);
 	}
 
-	private void postPlainText(String uri, String body) {
+	private void postPlainText(String uri, String body, Object... uriArgs) {
 		RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("text", "plain", Charset.forName("UTF-8")));
         restTemplate.postForLocation(uri,
-                new HttpEntity<String>(body, headers));
+                new HttpEntity<String>(body, headers),
+                uriArgs);
 	}
 
 	private Cart loadCartFromBackend(String trackingId) {
@@ -285,14 +280,5 @@ public class CartService {
 
 	private boolean empty(String string) {
 		return string == null || string.isEmpty();
-	}
-
-	private String encode(String text) {
-		try {
-			return URLEncoder.encode(text, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			// UTF-8 is always there 
-			return null;
-		}
 	}
 }
