@@ -23,7 +23,7 @@
 	  </section>
     </form>
 
- 	<form autocomplete="off" method="POST" action="/login">
+ 	<form method="POST" action="/login">
  	  <input type="hidden" name="forwardURL" value="/shop/orderData">
       <section class="form-part">
         <h3 style="max-width: 420px"><small>Wenn Du schon einen Account hast, logge Dich ein und Du musst Deine Daten nicht nochmal eingeben.</small></h3>
@@ -31,13 +31,13 @@
           <li class="form-field-group">
              <div class="form-field">
 	          <label for="username">E-Mail</label>
-	          <input type="text" class="form-control" id="username" name="username"/>
+	          <input type="email" class="form-control" id="username" name="username" required/>
 			 </div>
 	      </li>
           <li class="form-field-group">
              <div class="form-field">	
 	          <label for="password" class="">Passwort</label>
-	          <input type="password" class="form-control" id="password" name="password"/>           
+	          <input type="password" class="form-control" id="password" name="password" required/>           
 			 </div>
           </li>
           <li class="form-field-group">
