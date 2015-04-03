@@ -4,6 +4,7 @@ import java.util.EnumSet;
 
 import javax.servlet.DispatcherType;
 
+import net.mancke.microcart.voucher.VoucherService;
 import de.thomaskrille.dropwizard.environment_configuration.EnvironmentConfigurationFactoryFactory;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
@@ -63,9 +64,11 @@ public class MicrocartFrontServer extends Application<FrontConfiguration> {
     		.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
     	
         // Our Resources
-    	CartService cartService = new CartService(configuration);
-    	environment.jersey().register(new CartResource(configuration, cartService));
+    	VoucherService voucherService = new VoucherService(configuration);
+    	CartService cartService = new CartService(configuration, voucherService);
+    	environment.jersey().register(new CartResource(configuration, cartService, voucherService));
     	environment.jersey().register(new OrderResource(configuration, cartService));
+    	environment.jersey().register(voucherService);
     	
         // An example HealthCheck
         environment.healthChecks().register("demo health", new Health());       

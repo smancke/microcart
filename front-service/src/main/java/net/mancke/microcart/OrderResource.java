@@ -21,6 +21,7 @@ import net.mancke.microcart.model.Cart;
 import net.mancke.microcart.model.OrderData;
 import net.mancke.microcart.osiam.LoginHandler;
 import net.mancke.microcart.paypal.PayPalClient;
+import net.mancke.microcart.voucher.VoucherService;
 
 import com.codahale.metrics.annotation.Timed;
 

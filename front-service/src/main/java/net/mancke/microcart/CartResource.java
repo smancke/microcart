@@ -27,6 +27,7 @@ import org.springframework.web.client.RestTemplate;
 import net.mancke.microcart.model.Cart;
 import net.mancke.microcart.model.Position;
 import net.mancke.microcart.osiam.LoginHandler;
+import net.mancke.microcart.voucher.VoucherService;
 
 import com.codahale.metrics.annotation.Timed;
 
@@ -43,12 +44,16 @@ public class CartResource {
 
 	private CartService cartService;
 
+	private VoucherService voucherService;
+
     /**
+     * @param voucherService 
      */
     @Inject
-    public CartResource(final FrontConfiguration cfg, CartService cartService) {
+    public CartResource(final FrontConfiguration cfg, CartService cartService, VoucherService voucherService) {
         this.configuration = cfg;
         this.cartService = cartService;
+        this.voucherService = voucherService;
     }
 
     /**
@@ -110,6 +115,34 @@ public class CartResource {
     	if (req.getHeader("Referer") != null) {
     		return Response.seeOther(new URI(req.getHeader("Referer"))).build();
     	}
+    	return Response.seeOther(new URI("/shop/my-cart")).build();
+    }
+    
+    /**
+     * add a voucher item to the cart
+     */
+    @Timed
+    @POST
+    @Path("/my-cart/voucher")
+    public Response addVoucherToCart(
+    		@CookieParam(TrackingIdFilter.TRACKING_COOKIE_KEY) String trackingId, 
+    		@FormParam("voucherId") String voucherId, 
+    		@Context HttpServletRequest req,
+    		@BeanParam LoginHandler loginHandler) 
+    		throws URISyntaxException {
+    	
+    	Cart cart = cartService.getOrCreateCartByTrackingId(trackingId);
+    	
+    	if (! cart.containsVoucher()) {
+	    	Position position = voucherService.positionFromVoucher(voucherId);
+	    	if (position == null) {
+	        	return Response.seeOther(new URI("/shop/my-cart?invalidVoucher")).build();	    		
+	    	}
+	    	cart.addDeleteOrUpdatePosition(position);
+	    	cartService.saveCartToBackend(cart);
+	    	voucherService.use(voucherId, "");
+    	}
+    	
     	return Response.seeOther(new URI("/shop/my-cart")).build();
     }
 

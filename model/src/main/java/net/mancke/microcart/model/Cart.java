@@ -30,6 +30,15 @@ public class Cart {
     public Cart() {
     }
 
+	public boolean containsVoucher() {
+    	for (Position position : getPositions()) {
+    		if (Position.TYPE_VOUCHER.equals(position.getType())) {
+    			return true;
+    		}
+    	}
+		return false;
+	}
+
 	/**
 	 * price reflecting the discounts and shipping
 	 */

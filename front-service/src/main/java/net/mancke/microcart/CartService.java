@@ -1,9 +1,6 @@
 package net.mancke.microcart;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -12,6 +9,7 @@ import java.util.function.Predicate;
 import net.mancke.microcart.model.Cart;
 import net.mancke.microcart.model.OrderData;
 import net.mancke.microcart.osiam.LoginHandler;
+import net.mancke.microcart.voucher.VoucherService;
 
 import org.joda.time.DateTime;
 import org.osiam.resources.scim.Address;
@@ -20,9 +18,6 @@ import org.osiam.resources.scim.PhoneNumber;
 import org.osiam.resources.scim.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
@@ -39,8 +34,11 @@ public class CartService {
     
     private FrontConfiguration configuration;
 
-    public CartService(final FrontConfiguration cfg) {
+	private VoucherService voucherService;
+
+    public CartService(final FrontConfiguration cfg, VoucherService voucherService) {
         this.configuration = cfg;
+        this.voucherService = voucherService;
     }
 
 	public Cart getOrCreateCartByTrackingId(String trackingId) {
@@ -151,7 +149,7 @@ public class CartService {
 				te.renderPrecashPaymentInfo(cart, orderId).replaceAll("\\<[^>]*>","") 
 				);
 		String uri = configuration.getBackendURL() + "/mail/self/{to}/{subject}";
-		postPlainText(uri, body, cart.getOrderData().getEmail(), configuration.getOrderSuccessMailSubject());
+		MailHelper.postPlainText(uri, body, cart.getOrderData().getEmail(), configuration.getOrderSuccessMailSubject());
 	}
 
 	private void shopOwnerNotify(Cart cart, String orderId) {
@@ -177,16 +175,7 @@ public class CartService {
 		}
 
 		String uri = configuration.getBackendURL() + "/mail/{from}/self/{subject}";
-		postPlainText(uri, body.toString(), cart.getOrderData().getEmail(), subject);
-	}
-
-	private void postPlainText(String uri, String body, Object... uriArgs) {
-		RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(new MediaType("text", "plain", Charset.forName("UTF-8")));
-        restTemplate.postForLocation(uri,
-                new HttpEntity<String>(body, headers),
-                uriArgs);
+		MailHelper.postPlainText(uri, body.toString(), cart.getOrderData().getEmail(), subject);
 	}
 
 	private Cart loadCartFromBackend(String trackingId) {

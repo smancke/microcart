@@ -2,6 +2,10 @@ package net.mancke.microcart.model;
 
 public class Position {
 	
+	public static final String TYPE_ARTICLE = "article";
+	public static final String TYPE_VOUCHER = "voucher";
+	
+	String type = TYPE_ARTICLE;
 	String articleId;
 	String title;
 	String imageUrl;
@@ -47,5 +51,11 @@ public class Position {
 	}
 	public void setDiscountPercent(float discountPercent) {
 		this.discountPercent = discountPercent;
+	}
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
 	}
 }
