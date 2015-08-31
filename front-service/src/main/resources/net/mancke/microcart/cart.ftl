@@ -27,7 +27,7 @@
           <#if position.type?? && position.type == "voucher">
 	    <div class="row cart-row no-image">
 	      <div class="cart-description">
-		<span class="cart-label">${position.title}xx</span>
+		<span class="cart-label">${position.title}</span>
 	      </div>
 	      <div class="cart-other-price onsale">
 		<span class="cart-label">${position.pricePerUnit?string.currency}</span>

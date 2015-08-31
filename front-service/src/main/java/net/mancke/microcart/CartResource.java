@@ -85,6 +85,24 @@ public class CartResource {
     }
 
     /**
+     * returns number product meters
+     */
+    @Timed
+    @GET
+    @Path("/my-cart/articleTotalQuantity")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String getMyCartArticleTotalQuantity(@CookieParam(TrackingIdFilter.TRACKING_COOKIE_KEY) String trackingId) 
+    		throws URISyntaxException {
+    	
+    	double sum = cartService.getOrCreateCartByTrackingId(trackingId).getPositions().stream()
+    		.filter(position -> Position.TYPE_ARTICLE.equals(position.getType()))
+    		.mapToDouble(Position::getQuantity)
+    		.sum();
+    	
+    	return String.format("%1$,.1f", sum);
+    }
+
+    /**
      * added an article to the cart or changes the quantity of the article
      * @param articleId 
      * @param quantity 
