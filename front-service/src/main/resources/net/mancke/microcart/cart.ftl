@@ -75,7 +75,7 @@
 	  </#if>
 	  <div class="row cart-row no-image">
 	    <div class="cart-description">
-	      <span class="cart-label">Verpackung &amp; Versand<br><small>Versandkostenfrei ab ${cart.shippingCostLimit?string.currency} Warenwert</small></span>
+	      <span class="cart-label">Verpackung &amp; Versand<br><small>Versandkostenfrei ab ${cart.shippingCostLimit?string.currency} Warenwert innerhalb Deutschlands</small></span>
 	    </div>
 	    <div class="cart-other-price">
 	      <span class="cart-label">${cart.calculatedShippingCosts?string.currency}</span>
