@@ -67,7 +67,8 @@ public class MicrocartFrontServer extends Application<FrontConfiguration> {
     	VoucherService voucherService = new VoucherService(configuration);
     	CartService cartService = new CartService(configuration, voucherService);
     	environment.jersey().register(new CartResource(configuration, cartService, voucherService));
-    	environment.jersey().register(new OrderResource(configuration, cartService));
+        environment.jersey().register(new OrderResource(configuration, cartService));
+        environment.jersey().register(new DownloadResource(configuration, cartService));
     	environment.jersey().register(voucherService);
     	
         // An example HealthCheck

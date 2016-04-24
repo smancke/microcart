@@ -9,13 +9,15 @@ import net.mancke.microcart.model.Cart;
 
 public class OrderView extends View {
 
+	private FrontConfiguration cfg;
 	private Cart cart;
 	private List<ValidationError> validationErrors;
 	private String paymentInfo;
 
-	protected OrderView(String template, Cart cart) {
+	protected OrderView(String template, Cart cart, FrontConfiguration cfg) {
 		super(template, StandardCharsets.UTF_8);
 		this.cart = cart;
+		this.cfg = cfg;
 	}
 
 	public OrderView(String template, Cart cart,
@@ -38,6 +40,14 @@ public class OrderView extends View {
 
 	public void setCart(Cart cart) {
 		this.cart = cart;
+	}
+
+	public FrontConfiguration getCfg() {
+		return cfg;
+	}
+
+	public void setCfg(FrontConfiguration cfg) {
+		this.cfg = cfg;
 	}
 
 	public List<ValidationError> getValidationErrors() {

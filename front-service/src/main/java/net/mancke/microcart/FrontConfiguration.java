@@ -13,6 +13,9 @@ public class FrontConfiguration extends Configuration {
     private String backendURL = "http://127.0.0.1:5001";
 
 	@JsonProperty
+	private String shopURLPrefix = "http://127.0.0.1:5000/shop";
+
+	@JsonProperty
 	private float shippingCosts;
 
 	@JsonProperty
@@ -32,7 +35,15 @@ public class FrontConfiguration extends Configuration {
     
     @JsonProperty
     private String mailCheckFrom;
-    
+
+	public String getShopURLPrefix() {
+		return shopURLPrefix;
+	}
+
+	public void setShopURLPrefix(String shopURLPrefix) {
+		this.shopURLPrefix = shopURLPrefix;
+	}
+
 	public String getBackendURL() {
 		return backendURL;
 	}

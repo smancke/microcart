@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 
 import org.joda.time.DateTime;
 
@@ -21,7 +22,8 @@ public class Cart {
     private DateTime timestamp = new DateTime();
     private DateTime timestampLastUpdated = new DateTime();
     private PostProcessing postProcessing = new PostProcessing();
-    
+    private Map<String,Boolean> categories;
+
     public Cart(float shippingCosts, float shippingCostLimit) {
     	this.shippingCosts = shippingCosts;
     	this.shippingCostLimit = shippingCostLimit;
@@ -30,6 +32,11 @@ public class Cart {
     public Cart() {
     }
 
+	public boolean isAllowDownload() {
+		return orderData.getPaymentType() ==  "paypal" ||
+				(categories != null && categories.get("paid").booleanValue());
+	}
+
 	public boolean containsVoucher() {
     	for (Position position : getPositions()) {
     		if (Position.TYPE_VOUCHER.equals(position.getType())) {
@@ -37,6 +44,10 @@ public class Cart {
     		}
     	}
 		return false;
+	}
+
+	public boolean containsDownloads() {
+		return positions.stream().filter(position -> position.getDownloadLink() != null).count() > 0;
 	}
 
 	/**
@@ -64,9 +75,12 @@ public class Cart {
 	public float getCalculatedShippingCosts() {
 		if (getTotalPriceWithoutShipping() >= getShippingCostLimit()) {
 			return 0;
-		} else {
-			return getShippingCosts();
 		}
+		boolean onlyDownloadableArticles = positions.stream().filter(position -> position.getDownloadLink() == null).count() == 0;
+		if (onlyDownloadableArticles) {
+			return 0;
+		}
+		return getShippingCosts();
 	}
 	
 	public float getDiscountSaving() {
@@ -158,5 +172,13 @@ public class Cart {
 
 	public void setPostProcessing(PostProcessing postProcessing) {
 		this.postProcessing = postProcessing;
+	}
+
+	public Map<String, Boolean> getCategories() {
+		return categories;
+	}
+
+	public void setCategories(Map<String, Boolean> categories) {
+		this.categories = categories;
 	}
 }

@@ -158,7 +158,7 @@ public class CartService {
 				+ " "
 				+ cart.getOrderData().getFamilyName();
 		
-		String subject = "Bestellung von " + name + ": "+ orderId.substring(0, 5);
+		String subject = "Order: "+ cart.getTotalPrice() +", " + cart.getOrderData().getPaymentType() +", " + name + ": "+ orderId.substring(0, 5);
 
 		ObjectWriter mapper = new ObjectMapper().writerWithDefaultPrettyPrinter();
 		StringBuilder body = new StringBuilder();

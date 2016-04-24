@@ -9,3 +9,5 @@ node_modules
 ./front-service/target
 model/.settings
 model/.target
+*.iml
+.idea

@@ -24,6 +24,7 @@ import net.mancke.microcart.paypal.PayPalClient;
 import net.mancke.microcart.voucher.VoucherService;
 
 import com.codahale.metrics.annotation.Timed;
+import org.springframework.web.client.HttpClientErrorException;
 
 /**
  * 
@@ -67,7 +68,7 @@ public class OrderResource {
     		return Response.seeOther(new URI("/shop/orderData")).build();
     	}
     	return Response.ok().entity(
-    			new OrderView("orderRegister.ftl", cartService.getOrCreateCartByTrackingId(trackingId))
+    			new OrderView("orderRegister.ftl", cartService.getOrCreateCartByTrackingId(trackingId), configuration)
     			).build();
     }
 
@@ -87,7 +88,7 @@ public class OrderResource {
     	loginHandler.setConfig(configuration.getOsiamLogin());
     	Cart cart = cartService.getOrCreateCartByTrackingId(trackingId);
     	cartService.prefillOrderData(cart, loginHandler);
-    	return new OrderView("orderData.ftl", cart);
+    	return new OrderView("orderData.ftl", cart, configuration);
     }
     
 	/**
@@ -155,10 +156,10 @@ public class OrderResource {
     	loginHandler.setConfig(configuration.getOsiamLogin());
 
     	Cart cart = cartService.getOrCreateCartByTrackingId(trackingId);
-    	
+
     	PayPalClient payPal = new PayPalClient(configuration.getPayPal(), cart);
 		String payPalCorrelationId = payPal.endTransaction(token, payerid);
-		
+
 		cart.getOrderData().setPayPalCorrelationId(payPalCorrelationId);
     	String orderId = cartService.placeOrder(cart, loginHandler);
     	return Response.seeOther(new URI("/shop/orderConfirmation/"+ orderId)).build();
@@ -177,18 +178,22 @@ public class OrderResource {
     		@PathParam("orderId") String orderId) 
     		throws URISyntaxException {
 
+		try {
+			Cart cart = cartService.getOrder(orderId);
 
-    	Cart cart = cartService.getOrder(orderId);
-    	if (cart == null || cart.getId() == null) {
-    		throw new RuntimeException("no such order "+ orderId);
-    	}
-    	
-		OrderView orderView = new OrderView("orderConfirmation.ftl", cart);
-		
-    	orderView.setPaymentInfo(new TemplateEngine(configuration).renderPrecashPaymentInfo(cart, orderId));
-        	
-    	return orderView;
-    }
+			OrderView orderView = new OrderView("orderConfirmation.ftl", cart, configuration);
+
+			orderView.setPaymentInfo(new TemplateEngine(configuration).renderPrecashPaymentInfo(cart, orderId));
+
+			return orderView;
+		} catch (HttpClientErrorException httpError) {
+			if (httpError.getStatusCode().value() == 404) {
+				return new OrderView("noSuchOrder.ftl", null, configuration);
+			} else {
+				throw httpError;
+			}
+		}
+	}
     
 	private List<ValidationError> validate(OrderData orderData, boolean forceEmail) {
 		List<ValidationError> validationErrors = new ArrayList<ValidationError>();

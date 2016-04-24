@@ -48,14 +48,16 @@
 		  <form class="cart-quantity-form" action="/shop/my-cart/article" method="POST">
 		    <input type="hidden" name="articleId" value="${position.articleId}">
 		    <#setting locale="us_US">
-		      <input type="number" step="0.1" min="0.5" max="500" value="${position.quantity}" class="cart-quantity-form-field" name="quantity" placeholder="m">
+			  <#if ! (position.quantityFixed!false)>
+                  <input type="number" value="${position.quantity}" step="${position.qtyUnits!"0.1"}" min="${position.qtyMin!"0.5"}" max="500" class="cart-quantity-form-field" name="quantity" placeholder="m">
+                  <span>m</span>
+                  <button type="submit" class="cart-quantity-form-field btn btn-default btn-sm">
+                      <span class="glyphicon glyphicon-refresh"></span>
+                  </button>
+			  </#if>
 		      <#setting locale="de_DE">
-		        <span>m</span>
-		        <button type="submit" class="cart-quantity-form-field btn btn-default btn-sm">
-			  <span class="glyphicon glyphicon-refresh"></span> 		                  
-		        </button>           
 		        <button type="submit" name="action" value="removeArticle" class="cart-quantity-form-field btn btn-default btn-sm">
-			  <span class="glyphicon glyphicon-remove"></span> 		                  
+					<span class="glyphicon glyphicon-remove"></span>
 		        </button>           
 		  </form>
 	        </div>			            

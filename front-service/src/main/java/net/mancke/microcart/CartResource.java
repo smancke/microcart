@@ -98,8 +98,20 @@ public class CartResource {
     		.filter(position -> Position.TYPE_ARTICLE.equals(position.getType()))
     		.mapToDouble(Position::getQuantity)
     		.sum();
-    	
-    	return String.format("%1$,.1f", sum);
+
+		double sumDownloads = cartService.getOrCreateCartByTrackingId(trackingId).getPositions().stream()
+				.filter(position -> Position.TYPE_DOWNLOAD.equals(position.getType()))
+				.mapToDouble(Position::getQuantity)
+				.sum();
+
+		if (sumDownloads > 0 && sum > 0) {
+			return String.format("%1.0f Datei + %2$,.1fm", sumDownloads, sum);
+		}
+		if (sumDownloads > 0 && sum == 0) {
+			return String.format("%1.0f Datei", sumDownloads, sum);
+		}
+
+		return String.format("%1$,.1fm", sum);
     }
 
     /**
@@ -194,7 +206,14 @@ public class CartResource {
     	position.setDiscountPercent(article.getDiscount());
     	position.setImageUrl(article.getImg_thumb());
     	position.setTitle(article.getTitle());
-    	
+		position.setQuantityFixed(article.isQuantityFixed());
+		position.setQuantityMin(article.getQuantityMin());
+		position.setQuantityUnits(article.getQuantityUnits());
+		position.setDownloadLink(article.getDownloadLink());
+		if (article.getDownloadLink() != null) {
+			position.setType(Position.TYPE_DOWNLOAD);
+		}
+
 		return position;
 	}
 }

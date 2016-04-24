@@ -4,15 +4,52 @@ public class Position {
 	
 	public static final String TYPE_ARTICLE = "article";
 	public static final String TYPE_VOUCHER = "voucher";
-	
+	public static final String TYPE_DOWNLOAD = "download";
+
 	String type = TYPE_ARTICLE;
 	String articleId;
 	String title;
 	String imageUrl;
 	float quantity;
+	float quantityUnits;
+	float quantityMin;
+	boolean quantityFixed;
 	float pricePerUnit;
 	float discountPercent;
-	
+	String downloadLink;
+
+	public String getDownloadLink() {
+		return downloadLink;
+	}
+
+	public void setDownloadLink(String downloadLink) {
+		this.downloadLink = downloadLink;
+	}
+
+	public float getQuantityUnits() {
+		return quantityUnits;
+	}
+
+	public void setQuantityUnits(float quantityUnits) {
+		this.quantityUnits = quantityUnits;
+	}
+
+	public float getQuantityMin() {
+		return quantityMin;
+	}
+
+	public void setQuantityMin(float quantityMin) {
+		this.quantityMin = quantityMin;
+	}
+
+	public boolean isQuantityFixed() {
+		return quantityFixed;
+	}
+
+	public void setQuantityFixed(boolean quantityFixed) {
+		this.quantityFixed = quantityFixed;
+	}
+
 	public String getArticleId() {
 		return articleId;
 	}

@@ -31,6 +31,7 @@ public class TemplateEngine {
 	        Map<String, Object> data = new HashMap<String, Object>();
 	        data.put("cart", cart);
 	        data.put("paymentInfo", paymentInfo);
+			data.put("cfg", configuration);
 	                     
 	        ByteArrayOutputStream bos = new ByteArrayOutputStream();
 			Writer out = new OutputStreamWriter(bos);

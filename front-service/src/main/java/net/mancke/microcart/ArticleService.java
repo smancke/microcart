@@ -23,9 +23,45 @@ public class ArticleService {
 	    private String title;
 	    private String img_thumb;
 	    private float price;
-	    private float discount;	    
-	    
-	    public String getId() {
+	    private float discount;
+		private float quantityUnits;
+		private float quantityMin;
+		private boolean quantityFixed;
+		private String downloadLink;
+
+		public String getDownloadLink() {
+			return downloadLink;
+		}
+
+		public void setDownloadLink(String downloadLink) {
+			this.downloadLink = downloadLink;
+		}
+
+		public float getQuantityUnits() {
+			return quantityUnits;
+		}
+
+		public void setQuantityUnits(float quantityUnits) {
+			this.quantityUnits = quantityUnits;
+		}
+
+		public float getQuantityMin() {
+			return quantityMin;
+		}
+
+		public void setQuantityMin(float quantityMin) {
+			this.quantityMin = quantityMin;
+		}
+
+		public boolean isQuantityFixed() {
+			return quantityFixed;
+		}
+
+		public void setQuantityFixed(boolean quantityFixed) {
+			this.quantityFixed = quantityFixed;
+		}
+
+		public String getId() {
 	        return id;
 	    }
 	
