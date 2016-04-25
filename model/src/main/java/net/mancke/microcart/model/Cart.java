@@ -33,8 +33,13 @@ public class Cart {
     }
 
 	public boolean isAllowDownload() {
-		return orderData.getPaymentType() ==  "paypal" ||
-				(categories != null && categories.get("paid").booleanValue());
+		return ! isDownloadCountExceeded() &&
+				("paypal".equals(orderData.getPaymentType())  ||
+				(categories != null && categories.get("paid").booleanValue()));
+	}
+
+	public boolean isDownloadCountExceeded() {
+		return postProcessing.getDownloadCounter() >= 10;
 	}
 
 	public boolean containsVoucher() {

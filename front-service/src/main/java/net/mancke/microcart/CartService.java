@@ -53,10 +53,16 @@ public class CartService {
     	}	
     	return newEmptyCart(trackingId);
 	}
-	
+
 	public Cart getOrder(String orderId) {
 		RestTemplate restTemplate = new RestTemplate();
 		return restTemplate.getForObject(configuration.getBackendURL() + ORDER_RESOURCE + "/"+ orderId, Cart.class);
+	}
+
+	public void saveOrderToBackend(Cart cart) {
+		cart.setTimestampLastUpdated(new DateTime());
+		RestTemplate restTemplate = new RestTemplate();
+		restTemplate.postForLocation(configuration.getBackendURL() + ORDER_RESOURCE, cart);
 	}
 
 	public void saveCartToBackend(Cart cart) {

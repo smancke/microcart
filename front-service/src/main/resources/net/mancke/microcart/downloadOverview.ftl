@@ -7,26 +7,30 @@
 
 		<#if cart.containsDownloads()>
 	    <br>
-        <div class="container cart">
-			<#list cart.positions as position>
-				<#if position.type?? && position.type == "download">
-					<div class="row cart-row">
-						<div class="cart-image">
-							<img src="${position.imageUrl}" alt="${position.title}" />
-						</div>
-						<div class="cart-description">
-							<div class="cart-label">${position.title} <br>
-								<#if cart.allowDownload>
-									<a href="/shop/download/${cart.id}/${position.articleId}">&gt; Jetzt herunterladen</a>
-								<#else>
-								    Zahlungseingang noch nicht vermerkt.
-								</#if>
+			<#if cart.downloadCountExceeded>
+                Die maximale Anzahl Downloads wurde erreicht. Bitte kontaktiere uns, wenn Probleme beim Download bestehen.
+			<#else>
+				<div class="container cart">
+					<#list cart.positions as position>
+						<#if position.type?? && position.type == "download">
+							<div class="row cart-row">
+								<div class="cart-image">
+									<img src="${position.imageUrl}" alt="${position.title}" />
+								</div>
+								<div class="cart-description">
+									<div class="cart-label">${position.title} <br>
+										<#if cart.allowDownload>
+											<a href="/shop/download/${cart.id}/${position.articleId}">&gt; Jetzt herunterladen</a>
+										<#else>
+											Zahlungseingang noch nicht vermerkt.
+										</#if>
+									</div>
+								</div>
 							</div>
-						</div>
-					</div>
-				</#if>
-			</#list>
-		</div>
+						</#if>
+					</#list>
+				</div>
+			</#if>
 		<#else>
             Die Bestellung beinhaltet keine Downloads.
 		</#if>

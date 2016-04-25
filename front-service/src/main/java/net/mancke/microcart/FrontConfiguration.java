@@ -16,6 +16,9 @@ public class FrontConfiguration extends Configuration {
 	private String shopURLPrefix = "http://127.0.0.1:5000/shop";
 
 	@JsonProperty
+	private String downloadFileDirectory = "/downloads";
+
+	@JsonProperty
 	private float shippingCosts;
 
 	@JsonProperty
@@ -108,4 +111,11 @@ public class FrontConfiguration extends Configuration {
 		this.mailCheckFrom = mailCheckFrom;
 	}
 
+	public String getDownloadFileDirectory() {
+		return downloadFileDirectory;
+	}
+
+	public void setDownloadFileDirectory(String downloadFileDirectory) {
+		this.downloadFileDirectory = downloadFileDirectory;
+	}
 }
