@@ -42,15 +42,15 @@
 	        <div class="cart-label">${position.title}</div>
 	      </div>
 	      <div class="cart-price">
-	        <span class="cart-label">${position.pricePerUnit?string.currency}/m</span>
+	        <span class="cart-label">${position.pricePerUnit?string.currency}<span <#if (position.quantityUnits!0.1) == 1>style="visibility: hidden"</#if>>/m</span></span>
 	        
 	        <div class="cart-quantity">
 		  <form class="cart-quantity-form" action="/shop/my-cart/article" method="POST">
 		    <input type="hidden" name="articleId" value="${position.articleId}">
 		    <#setting locale="us_US">
 			  <#if ! (position.quantityFixed!false)>
-                  <input type="number" value="${position.quantity}" step="${position.qtyUnits!"0.1"}" min="${position.qtyMin!"0.5"}" max="500" class="cart-quantity-form-field" name="quantity" placeholder="m">
-                  <span>m</span>
+                  <input type="number" value="${position.quantity}" step="${position.quantityUnits!"0.1"}" min="${position.quantityMin!"0.5"}" max="500" class="cart-quantity-form-field" name="quantity">
+				  <span <#if (position.quantityUnits!0.1) == 1>style="visibility: hidden"</#if>>m</span>
                   <button type="submit" class="cart-quantity-form-field btn btn-default btn-sm">
                       <span class="glyphicon glyphicon-refresh"></span>
                   </button>

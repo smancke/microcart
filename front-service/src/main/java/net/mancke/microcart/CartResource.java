@@ -2,6 +2,7 @@ package net.mancke.microcart;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -93,25 +94,31 @@ public class CartResource {
     @Produces(MediaType.TEXT_PLAIN)
     public String getMyCartArticleTotalQuantity(@CookieParam(TrackingIdFilter.TRACKING_COOKIE_KEY) String trackingId) 
     		throws URISyntaxException {
-    	
-    	double sum = cartService.getOrCreateCartByTrackingId(trackingId).getPositions().stream()
-    		.filter(position -> Position.TYPE_ARTICLE.equals(position.getType()))
-    		.mapToDouble(Position::getQuantity)
-    		.sum();
 
-		double sumDownloads = cartService.getOrCreateCartByTrackingId(trackingId).getPositions().stream()
-				.filter(position -> Position.TYPE_DOWNLOAD.equals(position.getType()))
+		List<Position> positions = cartService.getOrCreateCartByTrackingId(trackingId).getPositions();
+		double sumPieces = positions.stream()
+				.filter(position -> position.getQuantityUnits() == 1)
+				.mapToDouble(Position::getQuantity)
+				.sum();
+		
+		double sumNonPieces = positions.stream()
+				.filter(position -> position.getQuantityUnits() != 1)
 				.mapToDouble(Position::getQuantity)
 				.sum();
 
-		if (sumDownloads > 0 && sum > 0) {
-			return String.format("%1.0f Datei + %2$,.1fm", sumDownloads, sum);
+		String qty = "";
+
+		if (sumPieces > 0) {
+			qty += sumPieces + "x";
 		}
-		if (sumDownloads > 0 && sum == 0) {
-			return String.format("%1.0f Datei", sumDownloads, sum);
+		if (sumNonPieces > 0) {
+			if (qty.length() > 0) {
+				qty += " + ";
+			}
+			qty += String.format("%1$,.1fm", sumNonPieces);
 		}
 
-		return String.format("%1$,.1fm", sum);
+		return qty;
     }
 
     /**
