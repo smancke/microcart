@@ -5,15 +5,17 @@ vielen Dank für deine Bestellung!
 <#if paymentInfo??>${paymentInfo}</#if>
 Positionen:
 <#list cart.positions as position>
- <#if position.type?? && (position.type == "voucher" || position.type == "download")>
-${position.title} ${position.pricePerUnit?string.currency}
+ <#if position.type?? && position.type == "voucher">
+  ${position.title} ${position.pricePerUnit?string.currency}
+ <#elseif position.quantityUnits == 1>
+  ${position.quantity}x ${position.title} (je ${position.pricePerUnit?string.currency})
  <#else>
-${position.quantity}m ${position.title} (${position.pricePerUnit?string.currency}/m)
+  ${position.quantity}m ${position.title} (${position.pricePerUnit?string.currency}/m)
  </#if>
 </#list>
-Verpackung & Versand ${cart.calculatedShippingCosts?string.currency}
+  Verpackung & Versand ${cart.calculatedShippingCosts?string.currency}
 
-Gesamtbetrag: ${cart.totalPrice?string.currency}
+  Gesamtbetrag: ${cart.totalPrice?string.currency}
 
 <#if cart.containsDownloads()>
  <#if cart.orderData.paymentType == "paypal">
