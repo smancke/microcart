@@ -82,13 +82,11 @@
 	          	<input type="radio" class="form-control" id="paypal" name="paymentType" value="paypal"<#if d.paymentType?? && d.paymentType == 'paypal'> checked</#if>/><label for="paypal"><img src="https://www.paypalobjects.com/webstatic/de_DE/i/de-pp-logo-100px.png" border="0" alt="PayPal Logo" /></label>
             </div>
           </li>
-          <!--
           <li>
             <div class="form-field">
 	          	<input type="radio" class="form-control" id="paymentType" name="paymentType" value="preCash"<#if d.paymentType?? && d.paymentType == 'preCash'> checked</#if>/><label for="paymentType">Überweisung/Vorkasse</label>
             </div>
           </li>
-          -->
         </ul>
       </section>
       
