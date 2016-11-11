@@ -4,16 +4,9 @@
     <title>Bilderbuch-Stoff.de - Bestellübersicht</title>
 </head>
 <body>
-<uic-fragment name="content">
+<uic-fragment name="cartLink">
 
-<#setting locale="de_DE">
-
-    <div class="container">
-	    <h1>Bestellung nicht gefunden</h1>
-
-		<br>Die Bestellung konnte im System nicht gefunden werden.
-
-	</div>
+    <a href="/shop/my-cart"><span class="glyphicon glyphicon-shopping-cart"></span> <span class="badge">${cartLabel}</span></a>
 
 </uic-fragment>
 </body>

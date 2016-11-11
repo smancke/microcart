@@ -1,4 +1,10 @@
-<!--# include virtual="/_header?title=Bestellung&page=shop" -->
+<html>
+<head>
+    <link uic-remove rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <title>Bilderbuch-Stoff.de - Bestelldaten</title>
+</head>
+<body>
+<uic-fragment name="content">
 
 <#setting locale="de_DE">
 <#assign d=cart.orderData>
@@ -137,3 +143,7 @@
     	});
     </script>
 </#if>
+
+</uic-fragment>
+</body>
+</html>

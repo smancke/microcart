@@ -1,4 +1,10 @@
-<!--# include virtual="/_header?title=Einkaufswagen&page=cart" -->
+<html>
+<head>
+    <link uic-remove rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+	<title>Bilderbuch-Stoff.de - Einkaufswagen</title>
+</head>
+<body>
+<uic-fragment name="content">
 
 <#setting locale="de_DE">
 
@@ -77,7 +83,7 @@
 	  </#if>
 	  <div class="row cart-row no-image">
 	    <div class="cart-description">
-	      <span class="cart-label">Verpackung &amp; Versand innerhalb Deutschlands<br><small>Versandkostenfrei ab ${cart.shippingCostLimit?string.currency} Warenwert</small></span>
+	      <span class="cart-label">Verpackung &amp; Versand innerhalb Deutschlands<br><small>Versandkostenfrei ab ${cart.shippingCostLimit?string.currency} Warenwert.</small><!--<br>Versandkosten ins Ausland werden nach Bestellung gesondert berechnet.--></span>
 	    </div>
 	    <div class="cart-other-price">
 	      <span class="cart-label">${cart.calculatedShippingCosts?string.currency}</span>
@@ -116,6 +122,8 @@
 	    </div>		        		        		        
 	  </div>
           </#if> 
-  </div> 
-  
-  <!--# include virtual="/_footer" -->
+  </div>
+
+</uic-fragment>
+</body>
+</html>

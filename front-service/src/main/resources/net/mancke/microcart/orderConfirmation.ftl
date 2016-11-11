@@ -1,4 +1,10 @@
-<!--# include virtual="/_header?title=Bestellung&page=orderConfirmation" -->
+<html>
+<head>
+    <link uic-remove rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <title>Bilderbuch-Stoff.de - Bestellbestätigung</title>
+</head>
+<body>
+<uic-fragment name="content">
 
 <#setting locale="de_DE">
 
@@ -19,4 +25,7 @@
 			</p>
 		</#if>
 	</div>
-<!--# include virtual="/_footer" -->
+
+</uic-fragment>
+</body>
+</html>

@@ -64,15 +64,26 @@ public class CartResource {
      */
     @Timed
     @GET
-    @Path("/my-cart")
-    @Produces({"text/html; charset=utf-8", MediaType.APPLICATION_JSON})
-    public CartView getMyCartHtml(@CookieParam(TrackingIdFilter.TRACKING_COOKIE_KEY) String trackingId) 
+    @Path("/my-cart/link")
+    @Produces({"text/html; charset=utf-8"})
+    public CartLinkView getMyCartLink(@CookieParam(TrackingIdFilter.TRACKING_COOKIE_KEY) String trackingId)
     		throws URISyntaxException {
-    	
-    	return new CartView(cartService.getOrCreateCartByTrackingId(trackingId));
+
+		String cartLabel = getMyCartArticleTotalQuantity(trackingId);
+    	return new CartLinkView(cartLabel);
     }
 
-    /**
+	@Timed
+	@GET
+	@Path("/my-cart")
+	@Produces({"text/html; charset=utf-8", MediaType.APPLICATION_JSON})
+	public CartView getMyCartHtml(@CookieParam(TrackingIdFilter.TRACKING_COOKIE_KEY) String trackingId)
+			throws URISyntaxException {
+
+		return new CartView(cartService.getOrCreateCartByTrackingId(trackingId));
+	}
+
+	/**
      * returns number if cart items as simple text.
      */
     @Timed
