@@ -18,8 +18,8 @@ payPal:
   cancelBaseUrl: $env:paypal_cancel_base_url:http://127.0.0.1:5000/shop/orderData
 
 osiamLogin:
-  authServerEndpoint: $env:osiam_auth_server_home:http://127.0.0.1:5004/osiam-auth-server/
-  resourceServerEndpoint: $env:osiam_resource_server_home:http://127.0.0.1:5004/osiam-resource-server/
+  authServerEndpoint: $env:osiam_auth_server_home:http://127.0.0.1:6001/osiam-auth-server/
+  resourceServerEndpoint: $env:osiam_resource_server_home:http://127.0.0.1:6001/osiam-resource-server/
   clientId: $env:osiam_client_id:bsweb
   clientSecret: $env:osiam_client_secret:trdjnlkmzt23d21
   sessionCookieSecret: $env:session_secret:secretsecretsecretsecretsecretse
