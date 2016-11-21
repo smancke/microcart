@@ -5,9 +5,7 @@
 </head>
 <body>
 <uic-fragment name="cartLink">
-
-    <a href="/shop/my-cart"><span class="glyphicon glyphicon-shopping-cart"></span> <span class="badge">${cartLabel}</span></a>
-
+    <span class="badge">${cartLabel}</span>
 </uic-fragment>
 </body>
 </html>
