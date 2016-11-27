@@ -1,9 +1,19 @@
 package net.mancke.microcart.voucher;
 
 public class VoucherRequest {
+
 	public String type;
+	public String comment;
 	public float amount;
 	public int expiryDays;
+
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
 
 	public String getType() {
 		return type;

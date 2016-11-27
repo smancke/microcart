@@ -58,12 +58,15 @@ public class VoucherService {
 		}
 		return resultStatus;
 	}
-	
+
+	@POST
 	public Voucher create(VoucherRequest voucherRequest) {
 		Voucher voucher = new Voucher();
 		voucher.setId(UUID.randomUUID().toString().substring(0,8));
 		voucher.setVoucherType(voucherRequest.getType());
 		voucher.setVoucherAmount(voucherRequest.getAmount());
+		voucher.setInitialAmount(voucherRequest.getAmount());
+		voucher.setComment(voucherRequest.getComment());
 		Calendar c = Calendar.getInstance();
 		c.add(Calendar.DATE, voucherRequest.getExpiryDays());
 		voucher.setExpiryDate(c.getTime());
