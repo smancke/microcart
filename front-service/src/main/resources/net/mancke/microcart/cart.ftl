@@ -25,7 +25,7 @@
 
     <#if cart.positions?size != 0 >
         <div class="row cart-bottom-row">
-            <#if (cart.shippingCostLimit-cart.totalPriceWithoutShipping) gt 0 && (cart.shippingCostLimit-cart.totalPriceWithoutShipping) lt 20>
+            <#if (cart.calculatedShippingCosts) gt 0 && (cart.shippingCostLimit-cart.totalPriceWithoutShipping) gt 0 && (cart.shippingCostLimit-cart.totalPriceWithoutShipping) lt 20>
                 <div class="cart-description">
                     <h3 class="onsale">Nur
                         noch ${(cart.shippingCostLimit-cart.totalPriceWithoutShipping)?string.currency} und die
