@@ -133,9 +133,7 @@ public class CartResource {
     }
 
     /**
-     * added an article to the cart or changes the quantity of the article
-     * @param articleId 
-     * @param quantity 
+     * add an article to the cart or changes the quantity of the article
      */
     @Timed
     @POST
@@ -228,6 +226,7 @@ public class CartResource {
 		position.setQuantityMin(article.getQuantityMin());
 		position.setQuantityUnits(article.getQuantityUnits());
 		position.setDownloadLink(article.getDownloadLink());
+		position.setFreeShipping(article.isFreeShipping());
 		if (article.getDownloadLink() != null) {
 			position.setType(Position.TYPE_DOWNLOAD);
 		}

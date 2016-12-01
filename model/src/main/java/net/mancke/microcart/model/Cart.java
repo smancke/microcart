@@ -81,8 +81,8 @@ public class Cart {
 		if (getTotalPriceWithoutShipping() >= getShippingCostLimit()) {
 			return 0;
 		}
-		boolean onlyDownloadableArticles = positions.stream().filter(position -> position.getDownloadLink() == null).count() == 0;
-		if (onlyDownloadableArticles) {
+		long shippingFeeArticles = positions.stream().filter(position -> ! position.isFreeShipping()).count();
+		if (shippingFeeArticles == 0) {
 			return 0;
 		}
 		return getShippingCosts();

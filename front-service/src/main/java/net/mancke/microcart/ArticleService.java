@@ -28,6 +28,7 @@ public class ArticleService {
 		private float quantityMin;
 		private boolean quantityFixed;
 		private String downloadLink;
+		boolean freeShipping;
 
 		public String getDownloadLink() {
 			return downloadLink;
@@ -99,6 +100,14 @@ public class ArticleService {
 
 		public void setDiscount(float discount) {
 			this.discount = discount;
+		}
+
+		public boolean isFreeShipping() {
+			return freeShipping;
+		}
+
+		public void setFreeShipping(boolean freeShipping) {
+			this.freeShipping = freeShipping;
 		}
 	}
 }

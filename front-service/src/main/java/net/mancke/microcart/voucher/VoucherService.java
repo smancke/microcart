@@ -109,6 +109,7 @@ public class VoucherService {
 	public Position positionFromVoucher(String voucherId) {
 		Position position = new Position();
 		position.setType(Position.TYPE_VOUCHER);
+		position.setFreeShipping(true);
     	position.setArticleId(voucherId);
     	
     	Voucher voucher = find(voucherId);

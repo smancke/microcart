@@ -14,6 +14,7 @@ public class Position {
 	float quantityUnits;
 	float quantityMin;
 	boolean quantityFixed;
+	boolean freeShipping;
 	float pricePerUnit;
 	float discountPercent;
 	String downloadLink;
@@ -95,4 +96,13 @@ public class Position {
 	public void setType(String type) {
 		this.type = type;
 	}
+	public boolean isFreeShipping() {
+		return freeShipping;
+	}
+
+	public void setFreeShipping(boolean freeShipping) {
+		this.freeShipping = freeShipping;
+	}
+
+
 }
