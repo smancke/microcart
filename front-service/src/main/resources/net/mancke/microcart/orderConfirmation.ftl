@@ -27,5 +27,15 @@
 	</div>
 
 </uic-fragment>
+<uic-tail>
+    <script>
+		if (fbq) {
+            fbq('track', 'Purchase', {
+                value: ${cart.totalPrice},
+                currency: 'EUR'
+            });
+        }
+    </script>
+</uic-tail>
 </body>
 </html>

@@ -56,7 +56,13 @@
         </form>
 
         </div>
-
 </uic-fragment>
+<uic-tail>
+    <script>
+        if (fbq) {
+            fbq('track', 'InitiateCheckout');
+        }
+    </script>
+</uic-tail>
 </body>
 </html>

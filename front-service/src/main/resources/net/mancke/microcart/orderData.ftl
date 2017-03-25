@@ -145,5 +145,12 @@
 </#if>
 
 </uic-fragment>
+<uic-tail>
+    <script>
+        if (fbq) {
+            fbq('track', 'OrderData');
+        }
+    </script>
+</uic-tail>
 </body>
 </html>
