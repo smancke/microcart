@@ -23,6 +23,7 @@ public class Cart {
     private DateTime timestampLastUpdated = new DateTime();
     private PostProcessing postProcessing = new PostProcessing();
     private Map<String,Boolean> categories;
+	private String shippingBundleOrderId;
 
     public Cart(float shippingCosts, float shippingCostLimit) {
     	this.shippingCosts = shippingCosts;
@@ -185,5 +186,12 @@ public class Cart {
 
 	public void setCategories(Map<String, Boolean> categories) {
 		this.categories = categories;
+	}
+	public String getShippingBundleOrderId() {
+		return shippingBundleOrderId;
+	}
+
+	public void setShippingBundleOrderId(String shippingBundleOrderId) {
+		this.shippingBundleOrderId = shippingBundleOrderId;
 	}
 }

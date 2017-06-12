@@ -36,12 +36,8 @@
         <#list cart.positions as position>
             <#if position.type?? && position.type == "voucher">
                 <div class="row cart-row no-image">
-                    <div class="cart-description">
-                        <span class="cart-label">${position.title}</span>
-                    </div>
-                    <div class="cart-other-price onsale">
-                        <span class="cart-label">${position.pricePerUnit?string.currency}</span>
-                    </div>
+                    <div class="cart-description cart-h">${position.title}</div>
+                    <div class="cart-other-price onsale">${position.pricePerUnit?string.currency}</div>
                 </div>
             <#else>
                 <div class="row cart-row">
@@ -82,32 +78,58 @@
         </#list>
         <#if cart.discountSaving gt 0>
             <div class="row cart-row no-image">
-                <div class="cart-description">
-                    <span class="cart-label">Rabatt</span>
-                </div>
-                <div class="cart-other-price onsale">
-                    <span class="cart-label">- ${cart.discountSaving?string.currency}</span>
-                </div>
+                <div class="cart-description cart-h">Rabatt</div>
+                <div class="cart-other-price onsale">- ${cart.discountSaving?string.currency}</div>
             </div>
         </#if>
         <div class="row cart-row no-image">
+
             <div class="cart-description">
-                <span class="cart-label">Verpackung &amp; Versand innerhalb Deutschlands<br><small>Versandkostenfrei
-                    ab ${cart.shippingCostLimit?string.currency} Warenwert.
-                </small><!--<br>Versandkosten ins Ausland werden nach Bestellung gesondert berechnet.--></span>
+                <span class="cart-h">Versand innerhalb Deutschlands
+                    <br><small>Versandkostenfrei ab ${cart.shippingCostLimit?string.currency} Warenwert.</small>
+                </span>
+
+                <br>
+                <br>
+                <#if ! cart.shippingBundleOrderId?has_content >
+                  <a data-toggle="collapse" href="#shippingBundleCollapse">Mit offener Bestellung bündeln</a>
+                <#else>
+                    <br>
+                    <span class="cart-h"><b>Wird verschickt mit: ${cart.shippingBundleOrderId}</b></span>
+                    <form class="" action="/shop/my-cart/shippingBundle" method="POST">
+                        <input type="hidden" name="shippingBundleOrderId" value="">
+                        <button data-toggle="collapse" href="#shippingBundleCollapse" class="btn btn-default btn-sm">Ändern</button>
+                        <button type="submit" name="action" value="shippingBundle" class="btn btn-default btn-sm">Verknüpfung entfernen</button>
+                    </form>
+                </#if>
+                <div class="collapse" id="shippingBundleCollapse">
+                    <br><small>Wenn Du eine noch nicht versandte Bestellung oder Vorbestellung hast, kannst Du beide Bestellungen zusammen legen und Versandkosten sparen.
+                    Das Paket wird dann zusammen verschickt sobald alle Artikel vorliegen.</small>
+                    <br>
+                    <br>
+                    <form class="" action="/shop/my-cart/shippingBundle" method="POST">
+                        <input type="text" class="form-field" name="shippingBundleOrderId" placeholder="Bestell Nr" style="width: 150px">
+                        <button type="submit" name="action" value="shippingBundle" class="btn btn-default btn-sm">Offene Bestellung suchen</button>
+                    </form>
+                </div>
+
+                <br>
+                <a data-toggle="collapse" href="#foreignShipping">Info zum Versand ins Ausland</a>
+                <div class="collapse" id="foreignShipping">
+                    <br><small>Die Versandkosten außerhalb Deutschlands werden nach der Bestellung gesondert berechnet. Bitte einfach bestellen und im Kommentarfeld nochmal
+                    auf den Auslandsversand hinweisen. Wir melden uns dann mit den angepassten Versandkosten, so dass diese dann per Paypal oder Überweisung nachgezahlt
+                    werden können.</small>
+                </div>
             </div>
-            <div class="cart-other-price">
-                <span class="cart-label">${cart.calculatedShippingCosts?string.currency}</span>
-            </div>
+            <div class="cart-other-price">${cart.calculatedShippingCosts?string.currency}</div>
         </div>
+
         <div class="row cart-row no-image">
             <div class="cart-description">
-		<span class="cart-label">
-		  <form class="cart-quantity-form" action="/shop/my-cart/voucher" method="POST">
-              <input type="text" class="form-field" name="voucherId" placeholder="Gutscheincode" style="width: 150px">
-              <button type="submit" name="action" value="removeArticle" class="btn btn-default btn-sm">Einlösen</button>
-          </form>
-		</span>
+                <form action="/shop/my-cart/voucher" method="POST">
+                    <input type="text" class="form-field" name="voucherId" placeholder="Gutscheincode" style="width: 150px">
+                    <button type="submit" name="action" value="removeArticle" class="btn btn-default btn-sm">Einlösen</button>
+                </form>
             </div>
             <div class="cart-other-price onsale">
 				<span class="cart-label">&nbsp;

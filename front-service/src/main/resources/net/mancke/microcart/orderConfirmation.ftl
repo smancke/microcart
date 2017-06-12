@@ -28,6 +28,7 @@
 
 </uic-fragment>
 <uic-tail>
+<#setting locale="en_US">
     <script>
 		if (fbq) {
             fbq('track', 'Purchase', {
@@ -37,5 +38,6 @@
         }
     </script>
 </uic-tail>
+<#setting locale="de_DE">
 </body>
 </html>

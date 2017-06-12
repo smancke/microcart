@@ -192,6 +192,31 @@ public class CartResource {
     	return Response.seeOther(new URI("/shop/my-cart")).build();
     }
 
+	/**
+	 * add the order id of an order to bundle for shipping
+	 */
+	@Timed
+	@POST
+	@Path("/my-cart/shippingBundle")
+	public Response shippingBundle(
+			@CookieParam(TrackingIdFilter.TRACKING_COOKIE_KEY) String trackingId,
+			@FormParam("shippingBundleOrderId") String shippingBundleOrderId,
+			@Context HttpServletRequest req,
+			@BeanParam LoginHandler loginHandler)
+			throws URISyntaxException {
+
+		Cart cart = cartService.getOrCreateCartByTrackingId(trackingId);
+
+		shippingBundleOrderId = shippingBundleOrderId.toLowerCase();
+		shippingBundleOrderId = shippingBundleOrderId.replaceAll("bs-", "");
+		shippingBundleOrderId = shippingBundleOrderId.replaceAll("[^a-zA-Z0-9]", "");
+
+		cart.setShippingBundleOrderId(shippingBundleOrderId);
+		cartService.saveCartToBackend(cart);
+
+		return Response.seeOther(new URI("/shop/my-cart")).build();
+	}
+
 	private float verifyQuantity(String action, String quantityInput) {
 		if ("removeArticle".equals(action)) {
     		quantityInput = "0";
